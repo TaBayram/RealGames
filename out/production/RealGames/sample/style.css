@@ -7,3 +7,12 @@
 .generalbuttons{
     -fx-background-color: #FFFFDD;
 }
+
+.generalbuttons:hover{
+    -fx-background-color: #BBBBAA;
+}
+
+.generalbuttons:pressed{
+    -fx-background-color: #9cb8ff;
+    -fx-effect: dropshadow( one-pass-box , rgba(200,200,255,0.50) , 4, 25.0 , 0 , 0);
+}
