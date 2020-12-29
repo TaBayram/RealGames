@@ -19,10 +19,16 @@ public class Client {
                     DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
                     dataOutputStream.writeUTF("Hello Server");
                     dataOutputStream.flush();
-                    dataOutputStream.close();
-                    socket.close();
+
+
+                    while (true) {
+                        var objectInputStream = new ObjectInputStream(socket.getInputStream());
+                        String message = (String) objectInputStream.readObject();
+                        System.out.println("Message: " + message);
+                    }
+
                 } catch (Exception e) {
-                    System.out.println(e);
+                    System.out.println("Client - " +e);
                 }
                 return null;
             }

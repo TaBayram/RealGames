@@ -20,17 +20,23 @@ public class Server {
 
                     ServerSocket serverSocket = new ServerSocket(6666);
                     Socket socket = new Socket();
-                    DataInputStream dis;
+                    DataInputStream dataInputStream;
 
                     while (true) {
                         socket = serverSocket.accept();
-                        dis = new DataInputStream((socket.getInputStream()));
-                        String str = (String) dis.readUTF();
+                        dataInputStream = new DataInputStream((socket.getInputStream()));
+                        String str = (String) dataInputStream.readUTF();
                         System.out.println(str);
+
+
+                        ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                        objectOutputStream.writeObject("Hi Client ");
+                        objectOutputStream.flush();
+
                     }
                 }
                 catch(Exception e){
-                    System.out.println(e);
+                    System.out.println("Server - " + e);
                 }
                 return null;
             }
@@ -52,8 +58,8 @@ public class Server {
                     System.out.println(getClass().getName() + ">>>Ready to receive broadcast packets!");
 
                     //Receive a packet
-                    byte[] recvBuf = new byte[15000];
-                    DatagramPacket packet = new DatagramPacket(recvBuf, recvBuf.length);
+                    byte[] receiveBuf = new byte[15000];
+                    DatagramPacket packet = new DatagramPacket(receiveBuf, receiveBuf.length);
                     socket.receive(packet);
 
                     //Packet received
