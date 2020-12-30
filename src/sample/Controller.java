@@ -54,7 +54,7 @@ public class Controller {
 
     public void buttonCreateRoomClick(ActionEvent actionEvent) {
         StartServer();
-        Main.StartClient(Server.serverAddress);
+
         HideOtherMainsExceptThis(anchorPane_Room);
     }
 
@@ -168,7 +168,7 @@ public class Controller {
             else{
                 Client.playerName = result.get();
             }
-            Main.StartClient(inetAddress);
+            StartClient(inetAddress);
             AddPlayerToList(client.playerName);
             try{
                 client.StopFindingServers();
@@ -240,5 +240,9 @@ public class Controller {
 
     public void StartServer(){
         server.StartMainServer();
+    }
+
+    public void StartClient(InetAddress inetAddress){
+        client.StartMainServer(inetAddress);
     }
 }

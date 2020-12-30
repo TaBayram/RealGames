@@ -47,6 +47,8 @@ public class Server {
     }
 
     public class MainServer extends Thread{
+
+
         @Override
         public void run() {
             try{
@@ -55,6 +57,7 @@ public class Server {
 
                 ServerSocket serverSocket = new ServerSocket(6666);
                 serverAddress = serverSocket.getInetAddress();
+                controller.StartClient(serverAddress);
                 Socket socket = new Socket();
                 DataInputStream dataInputStream;
                 ObjectOutputStream objectOutputStream;

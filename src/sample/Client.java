@@ -1,12 +1,8 @@
 package sample;
 
-import javafx.concurrent.Task;
-
 import java.io.*;
 import java.net.*;
-import java.sql.Connection;
 import java.util.Enumeration;
-import java.util.concurrent.TimeoutException;
 
 public class Client {
 
@@ -19,7 +15,75 @@ public class Client {
     public static String serverName = "";
     public static String playerName = "";
 
-    public static Task StartClient(InetAddress inetAddress) {
+    MainClient mainClientThread;
+    private boolean mainClientThreadCanRun = false;
+
+    public void StartMainServer(InetAddress inetAddress){
+        mainClientThreadCanRun = true;
+        if(!mainClientThread.isAlive()){
+            mainClientThread = new MainClient(inetAddress);
+            mainClientThread.start();
+        }
+        else{
+
+        }
+
+
+    }
+
+    public void StopMainServer() {
+        mainClientThreadCanRun = false;
+
+    }
+
+
+    public class MainClient extends Thread{
+        public InetAddress inetAddress;
+
+        MainClient(InetAddress inetAddress){
+            this.inetAddress = inetAddress;
+        }
+
+
+        @Override
+        public void run() {
+            try {
+                Socket socket = new Socket(inetAddress, 6666);
+                DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                dataOutputStream.writeUTF("HelloServer "+playerName);
+                dataOutputStream.flush();
+
+
+                while (true) {
+                    var objectInputStream = new ObjectInputStream(socket.getInputStream());
+                    String message = ((String) objectInputStream.readObject()).trim();
+
+                    if(message.equals("HiClient")){
+                        System.out.println(message);
+                    }
+                    else if(message.startsWith("Players: ")){
+                        String[] players = message.split(" ");
+                        for (String player: players) {
+                            controller.AddPlayerToList(player);
+
+                        }
+                    }
+                    else if(message.startsWith("PlayerAdd: ")){
+                        String playerName = message.substring(message.indexOf(" "));
+                        controller.AddPlayerToList(playerName);
+                    }
+
+
+                }
+
+            } catch (Exception e) {
+                System.out.println("Client - " +e);
+            }
+        }
+    }
+
+
+    /*public static Task StartClient(InetAddress inetAddress) {
         return new Task() {
             @Override
             protected Object call() throws Exception {
@@ -58,7 +122,7 @@ public class Client {
                 return null;
             }
         };
-    }
+    }*/
 
 
 

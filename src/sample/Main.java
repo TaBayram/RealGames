@@ -70,12 +70,6 @@ public class Main extends Application {
     }
 
 
-    public static void StartClient(InetAddress inetAddress){
-        Task clientTask = Client.StartClient(inetAddress);
-        Thread thread2 = new Thread(clientTask);
-        thread2.start();
-    }
-
 
     public static void main(String[] args) {
         launch(args);
