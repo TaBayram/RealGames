@@ -1,19 +1,95 @@
 package sample;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Server {
     public static String ServerName = "Room";
 
+    public static ObservableList<String> players = FXCollections.observableArrayList();
+    final static List<ConnectedSocketsThread> clients = new ArrayList<>();
 
-    public static Task StartServer(){
+    MainServer mainServerThread = new MainServer();
+    private boolean mainServerThreadCanRun = false;
+
+    public void StartMainServer(){
+        mainServerThreadCanRun = true;
+        if(!mainServerThread.isAlive()){
+            mainServerThread = new MainServer();
+            mainServerThread.start();
+        }
+        else{
+
+        }
+
+
+    }
+
+    public void StopMainServer() {
+        mainServerThreadCanRun = false;
+
+    }
+
+    public class MainServer extends Thread{
+        @Override
+        public void run() {
+            try{
+                Thread discoveryThread = new Thread(DiscoveryThread.getInstance());
+                discoveryThread.start();
+
+                ServerSocket serverSocket = new ServerSocket(6666);
+                Socket socket = new Socket();
+                DataInputStream dataInputStream;
+                ObjectOutputStream objectOutputStream;
+
+                while (true) {
+                    socket = serverSocket.accept();
+
+                    for (ConnectedSocketsThread connectedSocketsThread: clients) {
+                        objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                        objectOutputStream.writeObject("Yusuf Geldi");
+                        objectOutputStream.flush();
+
+                    }
+                    ConnectedSocketsThread connectedSocketsThread = new ConnectedSocketsThread(socket);
+                    connectedSocketsThread.start();
+                    clients.add(connectedSocketsThread);
+
+                    dataInputStream = new DataInputStream((socket.getInputStream()));
+                    String str = (String) dataInputStream.readUTF();
+                    System.out.println(str);
+
+
+                    objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                    objectOutputStream.writeObject("Hi Client");
+                    objectOutputStream.flush();
+                    Thread.sleep(100);
+                    objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                    objectOutputStream.writeObject("Players: Ali Erdem Abdullah");
+                    objectOutputStream.flush();
+
+
+                }
+            }
+            catch(Exception e){
+                System.out.println("Server - " + e);
+            }
+        }
+    }
+
+
+
+
+
+   /* public static Task StartServer(){
         return new Task() {
             @Override
             protected Object call() throws Exception {
@@ -27,13 +103,14 @@ public class Server {
 
                     while (true) {
                         socket = serverSocket.accept();
+                        clients.add(new ConnectedSocketsThread(socket));
                         dataInputStream = new DataInputStream((socket.getInputStream()));
                         String str = (String) dataInputStream.readUTF();
                         System.out.println(str);
 
 
                         ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                        objectOutputStream.writeObject("Hi Client ");
+                        objectOutputStream.writeObject("Hi Client");
                         objectOutputStream.flush();
 
                     }
@@ -44,7 +121,33 @@ public class Server {
                 return null;
             }
         };
+    }*/
+
+    public class ConnectedSocketsThread extends Thread{
+        public Socket socket;
+        DataInputStream dataInputStream;
+
+        ConnectedSocketsThread(Socket socket){
+            this.socket = socket;
+        }
+
+        @Override
+        public void run() {
+            while(socket.isConnected()) {
+                try{
+                    dataInputStream = new DataInputStream((socket.getInputStream()));
+                    String str = (String) dataInputStream.readUTF();
+                    System.out.println(str);
+                }
+                catch(Exception exception){
+
+                }
+
+            }
+            //ANNOUNCE THE DC
+        }
     }
+
 
     public static class DiscoveryThread implements Runnable {
 

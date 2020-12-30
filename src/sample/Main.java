@@ -69,11 +69,6 @@ public class Main extends Application {
 
     }
 
-    public static void StartServer(){
-        Task serverTask = Server.StartServer();
-        Thread thread1 = new Thread(serverTask);
-        thread1.start();
-    }
 
     public static void StartClient(InetAddress inetAddress){
         Task clientTask = Client.StartClient(inetAddress);

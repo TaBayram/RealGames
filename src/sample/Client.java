@@ -25,8 +25,24 @@ public class Client {
 
                     while (true) {
                         var objectInputStream = new ObjectInputStream(socket.getInputStream());
-                        String message = (String) objectInputStream.readObject();
-                        System.out.println("Message: " + message);
+                        String message = ((String) objectInputStream.readObject()).trim();
+
+                        if(message.equals("Hi Client")){
+                            System.out.println(message);
+                        }
+                        else if(message.startsWith("Players: ")){
+                            String[] players = message.split(" ");
+                            for (String player: players) {
+                                System.out.println(player);
+
+                            }
+                        }
+
+                        Thread.sleep(1000);
+                        dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                        dataOutputStream.writeUTF("Hello After Sleep");
+                        dataOutputStream.flush();
+
                     }
 
                 } catch (Exception e) {

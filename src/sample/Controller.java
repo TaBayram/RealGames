@@ -38,6 +38,7 @@ public class Controller {
     }
 
     Client client = new Client();
+    Server server = new Server();
 
 
 
@@ -47,8 +48,7 @@ public class Controller {
     }
 
     public void buttonCreateRoomClick(ActionEvent actionEvent) {
-
-        Main.StartServer();
+        StartServer();
         HideOtherMainsExceptThis(anchorPane_Room);
     }
 
@@ -130,6 +130,12 @@ public class Controller {
 
     private void JoinARoomButtonClick(ActionEvent actionEvent,InetAddress inetAddress,String roomName){
         Main.StartClient(inetAddress);
+        try{
+            client.StopFindingServers();
+            client.StopReceivingInet();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
         HideOtherMainsExceptThis(anchorPane_Room);
         textField_RoomName.setEditable(false);
         textField_RoomName.setText(roomName);
@@ -184,5 +190,10 @@ public class Controller {
     public void textFieldRoomNameChange(ActionEvent actionEvent) {
         var textField = (TextField)actionEvent.getSource();
         Server.ServerName = textField.getText();
+    }
+
+
+    public void StartServer(){
+        server.StartMainServer();
     }
 }
