@@ -75,7 +75,7 @@ public class Server {
                         objectOutputStream = new ObjectOutputStream(connectedSocketsThread.socket.getOutputStream());
                         objectOutputStream.writeObject("PlayerAdd: "+clientName);
                         objectOutputStream.flush();
-                        players += connectedSocketsThread.clientName + " ";
+                        players += connectedSocketsThread.clientName + "&";
 
                     }
 

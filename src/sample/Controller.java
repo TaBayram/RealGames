@@ -261,6 +261,6 @@ public class Controller {
     }
 
     public void StartClient(InetAddress inetAddress){
-        client.StartMainServer(inetAddress);
+        client.StartMainClient(inetAddress);
     }
 }

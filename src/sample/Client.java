@@ -18,7 +18,7 @@ public class Client {
     MainClient mainClientThread = new MainClient(null);
     private boolean mainClientThreadCanRun = false;
 
-    public void StartMainServer(InetAddress inetAddress){
+    public void StartMainClient(InetAddress inetAddress){
         mainClientThreadCanRun = true;
         if(!mainClientThread.isAlive()){
             mainClientThread = new MainClient(inetAddress);
@@ -31,7 +31,7 @@ public class Client {
 
     }
 
-    public void StopMainServer() {
+    public void StopMainClient() {
         mainClientThreadCanRun = false;
 
     }
@@ -61,8 +61,8 @@ public class Client {
                     if(message.equals("HiClient")){
                         System.out.println(message);
                     }
-                    else if(message.startsWith("Players: ")){
-                        String[] players = message.split(" ");
+                    else if(message.startsWith("Players:&")){
+                        String[] players = message.substring(message.indexOf("&")).split("&");
                         for (String player: players) {
                             controller.AddPlayerToList(player);
 
