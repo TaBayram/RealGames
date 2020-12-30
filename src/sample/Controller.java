@@ -9,12 +9,14 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.net.InetAddress;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -129,6 +131,16 @@ public class Controller {
     }
 
     private void JoinARoomButtonClick(ActionEvent actionEvent,InetAddress inetAddress,String roomName){
+        TextInputDialog dialog = new TextInputDialog("walter");
+        dialog.setTitle("Text Input Dialog");
+        dialog.setHeaderText("Look, a Text Input Dialog");
+        dialog.setContentText("Please enter your name:");
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            Client.playerName = result.get();
+        }
+
         Main.StartClient(inetAddress);
         try{
             client.StopFindingServers();

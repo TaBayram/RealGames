@@ -11,6 +11,7 @@ import java.util.concurrent.TimeoutException;
 public class Client {
 
     public static String serverName = "";
+    public static String playerName = "";
 
     public static Task StartClient(InetAddress inetAddress) {
         return new Task() {
@@ -19,7 +20,7 @@ public class Client {
                 try {
                     Socket socket = new Socket(inetAddress, 6666);
                     DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                    dataOutputStream.writeUTF("Hello Server");
+                    dataOutputStream.writeUTF("Hello Server "+playerName);
                     dataOutputStream.flush();
 
 

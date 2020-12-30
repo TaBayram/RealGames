@@ -53,27 +53,34 @@ public class Server {
                 while (true) {
                     socket = serverSocket.accept();
 
+                    dataInputStream = new DataInputStream((socket.getInputStream()));
+                    String firstMessage = (String) dataInputStream.readUTF();
+                    System.out.println(firstMessage);
+                    String clientName = firstMessage.substring(firstMessage.lastIndexOf(" "));
+
+                    String players = "Players: ";
                     for (ConnectedSocketsThread connectedSocketsThread: clients) {
                         objectOutputStream = new ObjectOutputStream(connectedSocketsThread.socket.getOutputStream());
-                        objectOutputStream.writeObject("Yusuf Geldi");
+                        objectOutputStream.writeObject(clientName);
                         objectOutputStream.flush();
+                        players += connectedSocketsThread.clientName + " ";
+
+
 
                     }
-                    ConnectedSocketsThread connectedSocketsThread = new ConnectedSocketsThread(socket);
+                    ConnectedSocketsThread connectedSocketsThread = new ConnectedSocketsThread(clientName, socket);
                     connectedSocketsThread.start();
                     clients.add(connectedSocketsThread);
 
-                    dataInputStream = new DataInputStream((socket.getInputStream()));
-                    String str = (String) dataInputStream.readUTF();
-                    System.out.println(str);
+
 
 
                     objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
                     objectOutputStream.writeObject("Hi Client");
                     objectOutputStream.flush();
-                    Thread.sleep(100);
+                    
                     objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                    objectOutputStream.writeObject("Players: Ali Erdem Abdullah");
+                    objectOutputStream.writeObject(players);
                     objectOutputStream.flush();
 
 
@@ -124,10 +131,12 @@ public class Server {
     }*/
 
     public class ConnectedSocketsThread extends Thread{
+        public String clientName;
         public Socket socket;
         DataInputStream dataInputStream;
 
-        ConnectedSocketsThread(Socket socket){
+        ConnectedSocketsThread(String clientName, Socket socket){
+            this.clientName = clientName;
             this.socket = socket;
         }
 
