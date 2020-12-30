@@ -54,7 +54,7 @@ public class Server {
                     socket = serverSocket.accept();
 
                     for (ConnectedSocketsThread connectedSocketsThread: clients) {
-                        objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                        objectOutputStream = new ObjectOutputStream(connectedSocketsThread.socket.getOutputStream());
                         objectOutputStream.writeObject("Yusuf Geldi");
                         objectOutputStream.flush();
 

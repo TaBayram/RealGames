@@ -37,6 +37,9 @@ public class Client {
 
                             }
                         }
+                        else{
+                            System.out.println(message);
+                        }
 
                         Thread.sleep(1000);
                         dataOutputStream = new DataOutputStream(socket.getOutputStream());
