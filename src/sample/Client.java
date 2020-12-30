@@ -44,14 +44,11 @@ public class Client {
 
                             }
                         }
-                        else{
-                            System.out.println(message);
+                        else if(message.startsWith("PlayerAdd: ")){
+                            String playerName = message.substring(message.indexOf(" "));
+                            controller.AddPlayerToList(playerName);
                         }
 
-                        Thread.sleep(1000);
-                        dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                        dataOutputStream.writeUTF("Hello After Sleep");
-                        dataOutputStream.flush();
 
                     }
 

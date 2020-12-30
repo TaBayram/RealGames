@@ -68,7 +68,7 @@ public class Server {
                     String players = "Players: ";
                     for (ConnectedSocketsThread connectedSocketsThread: clients) {
                         objectOutputStream = new ObjectOutputStream(connectedSocketsThread.socket.getOutputStream());
-                        objectOutputStream.writeObject(clientName);
+                        objectOutputStream.writeObject("PlayerAdd: "+clientName);
                         objectOutputStream.flush();
                         players += connectedSocketsThread.clientName + " ";
 

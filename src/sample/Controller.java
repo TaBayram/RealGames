@@ -160,8 +160,16 @@ public class Controller {
 
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()){
-            Client.playerName = result.get();
+            if(result.get().trim() == ""){
+                Client.playerName = "Generic";
+
+            }
+            else{
+                Client.playerName = result.get();
+            }
+
         }
+        else return;
 
         Main.StartClient(inetAddress);
         try{
