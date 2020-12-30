@@ -70,7 +70,7 @@ public class Server {
                     System.out.println(firstMessage);
                     String clientName = firstMessage.substring(firstMessage.indexOf(" "));
 
-                    String players = "Players: ";
+                    String players = "Players:&";
                     for (ConnectedSocketsThread connectedSocketsThread: clients) {
                         objectOutputStream = new ObjectOutputStream(connectedSocketsThread.socket.getOutputStream());
                         objectOutputStream.writeObject("PlayerAdd: "+clientName);
