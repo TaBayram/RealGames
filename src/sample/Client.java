@@ -15,7 +15,7 @@ public class Client {
     public static String serverName = "";
     public static String playerName = "";
 
-    MainClient mainClientThread;
+    MainClient mainClientThread = new MainClient(null);
     private boolean mainClientThreadCanRun = false;
 
     public void StartMainServer(InetAddress inetAddress){

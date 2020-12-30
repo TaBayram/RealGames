@@ -45,6 +45,8 @@ public class Controller {
     Client client;
     Server server;
 
+    boolean isServerOwner = false;
+
 
 
     public void buttonPlayClick(ActionEvent actionEvent) {
@@ -53,9 +55,25 @@ public class Controller {
     }
 
     public void buttonCreateRoomClick(ActionEvent actionEvent) {
-        StartServer();
+        TextInputDialog dialog = new TextInputDialog("Enter Name");
+        dialog.setTitle("Text Input Dialog");
+        dialog.setHeaderText(null);
+        dialog.setContentText("Please enter your name:");
 
-        HideOtherMainsExceptThis(anchorPane_Room);
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()){
+            if(result.get().trim() == ""){
+                Client.playerName = "Generic";
+            }
+            else{
+                Client.playerName = result.get();
+            }
+            StartServer();
+            isServerOwner = true;
+            HideOtherMainsExceptThis(anchorPane_Room);
+
+        }
+
     }
 
     public void buttonBackClick(ActionEvent actionEvent) {
