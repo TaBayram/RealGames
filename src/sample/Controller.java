@@ -33,14 +33,17 @@ public class Controller {
     public AnchorPane anchorPane_FindRooms;
     public AnchorPane anchorPane_Room;
     public TextField textField_RoomName;
+    public VBox vBox_RoomPlayerList;
 
     public void initialize() {
         HideOtherMainsExceptThis(anchorPane_MainMenu);
+        client = new Client(this);
+        server = new Server(this);
 
     }
 
-    Client client = new Client();
-    Server server = new Server();
+    Client client;
+    Server server;
 
 
 
@@ -95,6 +98,25 @@ public class Controller {
         timer.schedule(task,2000L,8000L);
 
 
+    }
+
+    public void AddPlayerToList(String name) {
+        Platform.runLater(() -> {
+            var width = vBox_RoomList.getWidth();
+            Pane pane = new Pane();
+            pane.setPrefSize(width/.90,60);
+            pane.getStyleClass().add("serverpane");
+
+            Label labelPlayerName = new Label(name);
+            labelPlayerName.getStyleClass().add("minortext");
+
+            labelPlayerName.setLayoutX(5);
+            labelPlayerName.setLayoutY(5);
+
+            pane.getChildren().addAll(labelPlayerName);
+            vBox_RoomPlayerList.getChildren().add(pane);
+
+        });
     }
 
     private void ServerListCreateServerBox(InetAddress inetAddress,String roomName){

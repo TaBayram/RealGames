@@ -12,6 +12,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Server {
+    Controller controller;
+    Server(Controller controller){
+        this.controller = controller;
+
+    }
+
+
     public static String ServerName = "Room";
 
     public static ObservableList<String> players = FXCollections.observableArrayList();
@@ -56,7 +63,7 @@ public class Server {
                     dataInputStream = new DataInputStream((socket.getInputStream()));
                     String firstMessage = (String) dataInputStream.readUTF();
                     System.out.println(firstMessage);
-                    String clientName = firstMessage.substring(firstMessage.lastIndexOf(" "));
+                    String clientName = firstMessage.substring(firstMessage.indexOf(" "));
 
                     String players = "Players: ";
                     for (ConnectedSocketsThread connectedSocketsThread: clients) {
@@ -65,20 +72,20 @@ public class Server {
                         objectOutputStream.flush();
                         players += connectedSocketsThread.clientName + " ";
 
-
-
                     }
+
                     ConnectedSocketsThread connectedSocketsThread = new ConnectedSocketsThread(clientName, socket);
                     connectedSocketsThread.start();
                     clients.add(connectedSocketsThread);
 
+                    controller.AddPlayerToList(clientName);
 
 
 
                     objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                    objectOutputStream.writeObject("Hi Client");
+                    objectOutputStream.writeObject("HiClient");
                     objectOutputStream.flush();
-                    
+
                     objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
                     objectOutputStream.writeObject(players);
                     objectOutputStream.flush();

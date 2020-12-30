@@ -10,6 +10,12 @@ import java.util.concurrent.TimeoutException;
 
 public class Client {
 
+    static Controller controller;
+    Client(Controller controller){
+        this.controller = controller;
+
+    }
+
     public static String serverName = "";
     public static String playerName = "";
 
@@ -20,7 +26,7 @@ public class Client {
                 try {
                     Socket socket = new Socket(inetAddress, 6666);
                     DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                    dataOutputStream.writeUTF("Hello Server "+playerName);
+                    dataOutputStream.writeUTF("HelloServer "+playerName);
                     dataOutputStream.flush();
 
 
@@ -28,13 +34,13 @@ public class Client {
                         var objectInputStream = new ObjectInputStream(socket.getInputStream());
                         String message = ((String) objectInputStream.readObject()).trim();
 
-                        if(message.equals("Hi Client")){
+                        if(message.equals("HiClient")){
                             System.out.println(message);
                         }
                         else if(message.startsWith("Players: ")){
                             String[] players = message.split(" ");
                             for (String player: players) {
-                                System.out.println(player);
+                                controller.AddPlayerToList(player);
 
                             }
                         }
