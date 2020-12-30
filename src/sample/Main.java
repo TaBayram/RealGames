@@ -75,8 +75,8 @@ public class Main extends Application {
         thread1.start();
     }
 
-    public static void StartClient(){
-        Task clientTask = Client.StartClient();
+    public static void StartClient(InetAddress inetAddress){
+        Task clientTask = Client.StartClient(inetAddress);
         Thread thread2 = new Thread(clientTask);
         thread2.start();
     }

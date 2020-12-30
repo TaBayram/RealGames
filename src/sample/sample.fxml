@@ -34,16 +34,16 @@
             <TextField fx:id="textField_JoinRoomID" layoutX="241.0" layoutY="308.0" promptText="Enter The ID" />
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPane_Room" layoutX="10.0" layoutY="10.0" opacity="0.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
+      <AnchorPane fx:id="anchorPane_Room" layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
          <children>
             <Label layoutX="65.0" layoutY="66.0" text="Room">
                <font>
                   <Font name="Goudy Old Style Bold" size="49.0" />
                </font>
             </Label>
-            <Button fx:id="button_StartGame" layoutX="379.0" layoutY="521.0" mnemonicParsing="false"  prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Start Game" />
+            <Button fx:id="button_StartGame" layoutX="379.0" layoutY="521.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Start Game" />
             <Button fx:id="button_CancelRoom" layoutX="164.0" layoutY="521.0" mnemonicParsing="false" onAction="#buttonBackClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Cancel Room" />
-            <TextField fx:id="textField_RoomName" alignment="CENTER" layoutX="362.0" layoutY="73.0" prefHeight="43.0" prefWidth="217.0" promptText="Enter Room Name" text="Room">
+            <TextField fx:id="textField_RoomName" alignment="CENTER" layoutX="362.0" layoutY="73.0" onAction="#textFieldRoomNameChange" prefHeight="43.0" prefWidth="217.0" promptText="Enter Room Name" text="Room">
                <font>
                   <Font size="27.0" />
                </font>
@@ -60,7 +60,7 @@
             </Label>
             <Button fx:id="button_JoinRoom" layoutX="379.0" layoutY="521.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Join Room" />
             <Button fx:id="button_Back" layoutX="164.0" layoutY="521.0" mnemonicParsing="false" onAction="#buttonBackClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Back" />
-            <VBox fx:id="vBox_RoomList" alignment="CENTER" layoutX="48.0" layoutY="139.0" prefHeight="352.0" prefWidth="159.0" />
+            <VBox fx:id="vBox_RoomList" alignment="CENTER" layoutX="48.0" layoutY="139.0" prefHeight="352.0" prefWidth="159.0" spacing="10.0" />
          </children>
       </AnchorPane>
    </children>

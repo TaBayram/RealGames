@@ -16,3 +16,22 @@
     -fx-background-color: #9cb8ff;
     -fx-effect: dropshadow( one-pass-box , rgba(200,200,255,0.50) , 4, 25.0 , 0 , 0);
 }
+
+
+
+
+.serverpane{
+    -fx-background-color: #442222;
+}
+
+.minorbutton{
+    -fx-background-color: #DDFFAA;
+}
+
+.minorbutton:hover{
+    -fx-background-color: #FFAAAA;
+}
+
+.minortext{
+    -fx-text-fill: #DDDDDD;
+}
