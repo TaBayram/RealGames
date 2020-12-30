@@ -54,6 +54,7 @@ public class Controller {
 
     public void buttonCreateRoomClick(ActionEvent actionEvent) {
         StartServer();
+        Main.StartClient(Server.serverAddress);
         HideOtherMainsExceptThis(anchorPane_Room);
     }
 
@@ -153,9 +154,9 @@ public class Controller {
     }
 
     private void JoinARoomButtonClick(ActionEvent actionEvent,InetAddress inetAddress,String roomName){
-        TextInputDialog dialog = new TextInputDialog("walter");
+        TextInputDialog dialog = new TextInputDialog("Enter Name");
         dialog.setTitle("Text Input Dialog");
-        dialog.setHeaderText("Look, a Text Input Dialog");
+        dialog.setHeaderText(null);
         dialog.setContentText("Please enter your name:");
 
         Optional<String> result = dialog.showAndWait();
@@ -167,20 +168,22 @@ public class Controller {
             else{
                 Client.playerName = result.get();
             }
+            Main.StartClient(inetAddress);
+            AddPlayerToList(client.playerName);
+            try{
+                client.StopFindingServers();
+                client.StopReceivingInet();
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
+            HideOtherMainsExceptThis(anchorPane_Room);
+            textField_RoomName.setEditable(false);
+            textField_RoomName.setText(roomName);
 
         }
         else return;
 
-        Main.StartClient(inetAddress);
-        try{
-            client.StopFindingServers();
-            client.StopReceivingInet();
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-        HideOtherMainsExceptThis(anchorPane_Room);
-        textField_RoomName.setEditable(false);
-        textField_RoomName.setText(roomName);
+
 
     }
 

@@ -20,6 +20,7 @@ public class Server {
 
 
     public static String ServerName = "Room";
+    public static InetAddress serverAddress;
 
     public static ObservableList<String> players = FXCollections.observableArrayList();
     final static List<ConnectedSocketsThread> clients = new ArrayList<>();
@@ -53,6 +54,7 @@ public class Server {
                 discoveryThread.start();
 
                 ServerSocket serverSocket = new ServerSocket(6666);
+                serverAddress = serverSocket.getInetAddress();
                 Socket socket = new Socket();
                 DataInputStream dataInputStream;
                 ObjectOutputStream objectOutputStream;
