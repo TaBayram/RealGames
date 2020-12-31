@@ -45,7 +45,6 @@ public class Server {
     }
 
     public void StopMainServer() {
-        mainServerThreadCanRun = false;
         try{
             for(ConnectedSocketsThread socketsThread: clients){
                 socketsThread.Disconnect();
@@ -55,10 +54,23 @@ public class Server {
 
         }
 
+        mainServerThreadCanRun = false;
+        try {
+            if (mainServerThread.objectInputStream != null)
+                mainServerThread.objectInputStream.close();
+            if (mainServerThread.objectOutputStream != null)
+                mainServerThread.objectOutputStream.close();
+            mainServerThread.serverSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public class MainServer extends Thread{
-
+        ServerSocket serverSocket;
+        ObjectInputStream objectInputStream;
+        ObjectOutputStream objectOutputStream;
 
         @Override
         public void run() {
@@ -66,15 +78,19 @@ public class Server {
                 Thread discoveryThread = new Thread(DiscoveryThread.getInstance());
                 discoveryThread.start();
 
-                ServerSocket serverSocket = new ServerSocket(6666);
+                serverSocket = new ServerSocket(6666);
                 serverAddress = serverSocket.getInetAddress();
                 controller.StartClient(serverAddress);
                 Socket socket = new Socket();
-                ObjectInputStream objectInputStream;
-                ObjectOutputStream objectOutputStream;
 
-                while (true) {
-                    socket = serverSocket.accept();
+                while (mainServerThreadCanRun) {
+                    try{
+                        socket = serverSocket.accept();
+                    }
+                    catch(SocketException socketException){
+                        System.out.println("###Server Closed");
+                    }
+
 
 
                     objectInputStream = new ObjectInputStream(socket.getInputStream());
@@ -84,7 +100,7 @@ public class Server {
                         var packetPlayer = (DataPackages.Player)(packet);
 
                         if(packetPlayer.isJoining()){
-                            packetPlayer.setJoining(false);
+
                             var clientName = packetPlayer.getName();
                             System.out.println("### Player has joined! " +clientName);
 
@@ -107,6 +123,7 @@ public class Server {
                             objectOutputStream.flush();
 
                             //START A THREAD FOR JOINING PLAYER
+                            packetPlayer.setJoining(false);
                             ConnectedSocketsThread connectedSocketsThread = new ConnectedSocketsThread(packetPlayer, socket);
                             connectedSocketsThread.start();
 
@@ -121,6 +138,8 @@ public class Server {
 
 
                 }
+
+
             }
             catch(Exception e){
                 System.out.println("###Error " + e);
