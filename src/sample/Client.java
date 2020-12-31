@@ -49,80 +49,46 @@ public class Client {
         public void run() {
             try {
                 Socket socket = new Socket(inetAddress, 6666);
-                DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                dataOutputStream.writeUTF("HelloServer "+playerName);
-                dataOutputStream.flush();
+
+                //SEND YOURSELF AS JOINING PLAYER IN THE ROOM
+                DataPackages.Player newPlayer = new DataPackages().new Player(playerName);
+                newPlayer.setJoining(true);
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                objectOutputStream.writeObject(newPlayer);
+                objectOutputStream.flush();
 
 
                 while (true) {
                     var objectInputStream = new ObjectInputStream(socket.getInputStream());
-                    String message = ((String) objectInputStream.readObject()).trim();
+                    var packet = objectInputStream.readObject();
 
-                    if(message.equals("HiClient")){
-                        System.out.println(message);
-                    }
-                    else if(message.startsWith("Players:&")){
-                        String[] players = message.substring(message.indexOf("&")).split("&");
-                        for (String player: players) {
-                            controller.AddPlayerToList(player);
+                    if(packet.getClass() == DataPackages.Player.class){
+                        var packetPlayer = (DataPackages.Player)(packet);
+
+                        //A PLAYER HAS JOINED THE ROOM
+                        if(packetPlayer.isJoining()){
+                            System.out.println(">>> Player has joined! " +packetPlayer.getName());
+                            controller.AddPlayerToList(packetPlayer.getName());
 
                         }
                     }
-                    else if(message.startsWith("PlayerAdd: ")){
-                        String playerName = message.substring(message.indexOf(" "));
-                        controller.AddPlayerToList(playerName);
+                    //YOU HAVE JOINED THE ROOM AND GETTING THE PLAYER LIST
+                    else if(packet.getClass() == DataPackages.PlayerList.class){
+                        var packetPlayer = (DataPackages.PlayerList)(packet);
+                        for (String player: packetPlayer.getNames()) {
+                            controller.AddPlayerToList(player);
+                        }
                     }
-
 
                 }
 
             } catch (Exception e) {
-                System.out.println("Client - " +e);
+                System.out.println(">>>Error " +e);
             }
         }
     }
 
 
-    /*public static Task StartClient(InetAddress inetAddress) {
-        return new Task() {
-            @Override
-            protected Object call() throws Exception {
-                try {
-                    Socket socket = new Socket(inetAddress, 6666);
-                    DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                    dataOutputStream.writeUTF("HelloServer "+playerName);
-                    dataOutputStream.flush();
-
-
-                    while (true) {
-                        var objectInputStream = new ObjectInputStream(socket.getInputStream());
-                        String message = ((String) objectInputStream.readObject()).trim();
-
-                        if(message.equals("HiClient")){
-                            System.out.println(message);
-                        }
-                        else if(message.startsWith("Players: ")){
-                            String[] players = message.split(" ");
-                            for (String player: players) {
-                                controller.AddPlayerToList(player);
-
-                            }
-                        }
-                        else if(message.startsWith("PlayerAdd: ")){
-                            String playerName = message.substring(message.indexOf(" "));
-                            controller.AddPlayerToList(playerName);
-                        }
-
-
-                    }
-
-                } catch (Exception e) {
-                    System.out.println("Client - " +e);
-                }
-                return null;
-            }
-        };
-    }*/
 
 
 

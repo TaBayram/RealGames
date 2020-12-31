@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 public class Server {
     Controller controller;
+
     Server(Controller controller){
         this.controller = controller;
 
@@ -22,7 +24,6 @@ public class Server {
     public static String ServerName = "Room";
     public static InetAddress serverAddress;
 
-    public static ObservableList<String> players = FXCollections.observableArrayList();
     final static List<ConnectedSocketsThread> clients = new ArrayList<>();
 
     MainServer mainServerThread = new MainServer();
@@ -59,47 +60,60 @@ public class Server {
                 serverAddress = serverSocket.getInetAddress();
                 controller.StartClient(serverAddress);
                 Socket socket = new Socket();
-                DataInputStream dataInputStream;
+                ObjectInputStream objectInputStream;
                 ObjectOutputStream objectOutputStream;
 
                 while (true) {
                     socket = serverSocket.accept();
 
-                    dataInputStream = new DataInputStream((socket.getInputStream()));
-                    String firstMessage = (String) dataInputStream.readUTF();
-                    System.out.println(firstMessage);
-                    String clientName = firstMessage.substring(firstMessage.indexOf(" "));
 
-                    String players = "Players:&";
-                    for (ConnectedSocketsThread connectedSocketsThread: clients) {
-                        objectOutputStream = new ObjectOutputStream(connectedSocketsThread.socket.getOutputStream());
-                        objectOutputStream.writeObject("PlayerAdd: "+clientName);
-                        objectOutputStream.flush();
-                        players += connectedSocketsThread.clientName + "&";
+                    objectInputStream = new ObjectInputStream(socket.getInputStream());
+                    var packet = objectInputStream.readObject();
 
+                    if(packet.getClass() == DataPackages.Player.class){
+                        var packetPlayer = (DataPackages.Player)(packet);
+
+                        if(packetPlayer.isJoining()){
+
+                            var clientName = packetPlayer.getName();
+                            System.out.println("### Player has joined! " +clientName);
+
+                            DataPackages.PlayerList playerList = new DataPackages().new PlayerList();
+                            for (ConnectedSocketsThread connectedSocketsThread: clients) {
+
+                                //SEND THE PLAYER JOINING TO EVERYONE IN THE ROOM
+                                objectOutputStream = new ObjectOutputStream(connectedSocketsThread.socket.getOutputStream());
+                                objectOutputStream.writeObject(packetPlayer);
+                                objectOutputStream.flush();
+
+
+                                playerList.getNames().add(connectedSocketsThread.player.getName());
+
+                            }
+
+                            //SEND THE JOINING PLAYER THE PLAYERS IN THE ROOM
+                            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                            objectOutputStream.writeObject(playerList);
+                            objectOutputStream.flush();
+
+                            //START A THREAD FOR JOINING PLAYER
+                            ConnectedSocketsThread connectedSocketsThread = new ConnectedSocketsThread(packetPlayer, socket);
+                            connectedSocketsThread.start();
+
+                            clients.add(connectedSocketsThread);
+
+                        }
                     }
 
-                    ConnectedSocketsThread connectedSocketsThread = new ConnectedSocketsThread(clientName, socket);
-                    connectedSocketsThread.start();
-                    clients.add(connectedSocketsThread);
-
-                    controller.AddPlayerToList(clientName);
 
 
 
-                    objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                    objectOutputStream.writeObject("HiClient");
-                    objectOutputStream.flush();
-
-                    objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                    objectOutputStream.writeObject(players);
-                    objectOutputStream.flush();
 
 
                 }
             }
             catch(Exception e){
-                System.out.println("Server - " + e);
+                System.out.println("###Error " + e);
             }
         }
     }
@@ -108,47 +122,13 @@ public class Server {
 
 
 
-   /* public static Task StartServer(){
-        return new Task() {
-            @Override
-            protected Object call() throws Exception {
-                try{
-                    Thread discoveryThread = new Thread(DiscoveryThread.getInstance());
-                    discoveryThread.start();
-
-                    ServerSocket serverSocket = new ServerSocket(6666);
-                    Socket socket = new Socket();
-                    DataInputStream dataInputStream;
-
-                    while (true) {
-                        socket = serverSocket.accept();
-                        clients.add(new ConnectedSocketsThread(socket));
-                        dataInputStream = new DataInputStream((socket.getInputStream()));
-                        String str = (String) dataInputStream.readUTF();
-                        System.out.println(str);
-
-
-                        ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                        objectOutputStream.writeObject("Hi Client");
-                        objectOutputStream.flush();
-
-                    }
-                }
-                catch(Exception e){
-                    System.out.println("Server - " + e);
-                }
-                return null;
-            }
-        };
-    }*/
-
     public class ConnectedSocketsThread extends Thread{
-        public String clientName;
+        public DataPackages.Player player = new DataPackages().new Player();
         public Socket socket;
         DataInputStream dataInputStream;
 
-        ConnectedSocketsThread(String clientName, Socket socket){
-            this.clientName = clientName;
+        ConnectedSocketsThread(DataPackages.Player player, Socket socket){
+            this.player = player;
             this.socket = socket;
         }
 

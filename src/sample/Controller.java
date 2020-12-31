@@ -34,6 +34,7 @@ public class Controller {
     public AnchorPane anchorPane_Room;
     public TextField textField_RoomName;
     public VBox vBox_RoomPlayerList;
+    public AnchorPane anchorPane_GameMath;
 
     public void initialize() {
         HideOtherMainsExceptThis(anchorPane_MainMenu);
@@ -71,6 +72,7 @@ public class Controller {
             StartServer();
             isServerOwner = true;
             HideOtherMainsExceptThis(anchorPane_Room);
+            AddPlayerToList(Client.playerName);
 
         }
 
@@ -256,6 +258,14 @@ public class Controller {
     }
 
 
+    public void buttonStartGameClick(ActionEvent actionEvent) {
+        HideOtherMainsExceptThis(anchorPane_GameMath);
+    }
+
+
+
+
+
     public void StartServer(){
         server.StartMainServer();
     }
@@ -263,4 +273,6 @@ public class Controller {
     public void StartClient(InetAddress inetAddress){
         client.StartMainClient(inetAddress);
     }
+
+
 }

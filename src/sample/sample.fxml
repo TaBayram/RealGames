@@ -34,14 +34,14 @@
             <TextField fx:id="textField_JoinRoomID" layoutX="241.0" layoutY="308.0" promptText="Enter The ID" />
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPane_Room" layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
+      <AnchorPane fx:id="anchorPane_Room" layoutX="10.0" layoutY="10.0" opacity="0.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
          <children>
             <Label layoutX="65.0" layoutY="66.0" text="Room">
                <font>
                   <Font name="Goudy Old Style Bold" size="49.0" />
                </font>
             </Label>
-            <Button fx:id="button_StartGame" layoutX="379.0" layoutY="521.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Start Game" />
+            <Button fx:id="button_StartGame" layoutX="379.0" layoutY="521.0" mnemonicParsing="false" onAction="#buttonStartGameClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Start Game" />
             <Button fx:id="button_CancelRoom" layoutX="164.0" layoutY="521.0" mnemonicParsing="false" onAction="#buttonBackClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Cancel Room" />
             <TextField fx:id="textField_RoomName" alignment="CENTER" layoutX="362.0" layoutY="73.0" onAction="#textFieldRoomNameChange" prefHeight="43.0" prefWidth="217.0" promptText="Enter Room Name" text="Room">
                <font>
@@ -61,6 +61,23 @@
             <Button fx:id="button_JoinRoom" layoutX="379.0" layoutY="521.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Join Room" />
             <Button fx:id="button_Back" layoutX="164.0" layoutY="521.0" mnemonicParsing="false" onAction="#buttonBackClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Back" />
             <VBox fx:id="vBox_RoomList" alignment="CENTER" layoutX="48.0" layoutY="139.0" prefHeight="352.0" prefWidth="159.0" spacing="10.0" />
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="anchorPane_GameMath" layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
+         <children>
+            <Label layoutX="155.0" layoutY="28.0" text="Math">
+               <font>
+                  <Font name="Goudy Old Style Bold" size="49.0" />
+               </font>
+            </Label>
+            <Button fx:id="button_GMSendAnswer" layoutX="110.0" layoutY="441.0" mnemonicParsing="false" onAction="#buttonSearchRoomClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Search Room" />
+            <TextField fx:id="textField_GMAnswer" layoutX="77.0" layoutY="354.0" prefHeight="57.0" prefWidth="265.0" promptText="Enter The ID" />
+            <Label alignment="CENTER" layoutX="32.0" layoutY="149.0" prefHeight="105.0" prefWidth="354.0" text="3 + 2">
+               <font>
+                  <Font name="Goudy Old Style Bold" size="49.0" />
+               </font>
+            </Label>
+            <VBox fx:id="vBox_GMPlayer" alignment="CENTER" layoutX="427.0" prefHeight="600.0" prefWidth="159.0" spacing="10.0" />
          </children>
       </AnchorPane>
    </children>
