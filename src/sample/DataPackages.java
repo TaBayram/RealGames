@@ -9,6 +9,7 @@ public class DataPackages implements java.io.Serializable{
         private int ID;
         private String name;
         private int score;
+
         private boolean isJoining;
         private boolean isLeaving;
         private boolean isSendingAnswer;

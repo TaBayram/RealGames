@@ -29,6 +29,8 @@ public class Server {
     MainServer mainServerThread = new MainServer();
     private boolean mainServerThreadCanRun = false;
 
+
+
     public void StartMainServer(){
         mainServerThreadCanRun = true;
         if(!mainServerThread.isAlive()){
@@ -44,6 +46,14 @@ public class Server {
 
     public void StopMainServer() {
         mainServerThreadCanRun = false;
+        try{
+            for(ConnectedSocketsThread socketsThread: clients){
+                socketsThread.Disconnect();
+            }
+        }
+        catch(Exception exception){
+
+        }
 
     }
 
@@ -74,7 +84,7 @@ public class Server {
                         var packetPlayer = (DataPackages.Player)(packet);
 
                         if(packetPlayer.isJoining()){
-
+                            packetPlayer.setJoining(false);
                             var clientName = packetPlayer.getName();
                             System.out.println("### Player has joined! " +clientName);
 
@@ -130,6 +140,18 @@ public class Server {
         ConnectedSocketsThread(DataPackages.Player player, Socket socket){
             this.player = player;
             this.socket = socket;
+        }
+
+        public void Disconnect(){
+            try {
+                player.setLeaving(true);
+                var objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                objectOutputStream.writeObject(player);
+                objectOutputStream.flush();
+            }
+            catch (Exception e){
+                System.out.println("##>Error "+ e.getMessage());
+            }
         }
 
         @Override

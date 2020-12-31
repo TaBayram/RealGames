@@ -71,6 +71,12 @@ public class Client {
                             controller.AddPlayerToList(packetPlayer.getName());
 
                         }
+                        else if(packetPlayer.isLeaving()){
+                            System.out.println(">>> Getting Kicked");
+                            controller.ShowPlayBecauseYouGotKicked();
+                            socket.close();
+                            break;
+                        }
                     }
                     //YOU HAVE JOINED THE ROOM AND GETTING THE PLAYER LIST
                     else if(packet.getClass() == DataPackages.PlayerList.class){

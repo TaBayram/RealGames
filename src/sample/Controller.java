@@ -24,15 +24,15 @@ public class Controller {
 
 
     public AnchorPane anchorPane_MainMenu;
-    public Button button_Play;
-    public Button button_Options;
-    public Button button_Quit;
+    public Button button_MMPlay;
+    public Button button_MMOptions;
+    public Button button_MMQuit;
     public AnchorPane anchorPane_Play;
     public StackPane stackPane_Main;
-    public VBox vBox_RoomList;
+    public VBox vBox_FRRoomList;
     public AnchorPane anchorPane_FindRooms;
     public AnchorPane anchorPane_Room;
-    public TextField textField_RoomName;
+    public TextField textField_RRoomName;
     public VBox vBox_RoomPlayerList;
     public AnchorPane anchorPane_GameMath;
 
@@ -48,12 +48,15 @@ public class Controller {
 
     boolean isServerOwner = false;
 
-
+    //MAIN MENU SCREEN
 
     public void buttonPlayClick(ActionEvent actionEvent) {
         HideOtherMainsExceptThis(anchorPane_Play);
-        
+
     }
+
+
+    //PLAY MENU SCREEN
 
     public void buttonCreateRoomClick(ActionEvent actionEvent) {
         TextInputDialog dialog = new TextInputDialog("Enter Name");
@@ -78,19 +81,7 @@ public class Controller {
 
     }
 
-    public void buttonBackClick(ActionEvent actionEvent) {
-        HideOtherMainsExceptThis(anchorPane_Play);
-
-        try{
-            client.StopFindingServers();
-            client.StopReceivingInet();
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-
-    }
-
-    public void buttonSearchRoomClick(ActionEvent actionEvent) throws InterruptedException {
+    public void buttonSearchRoomClick(ActionEvent actionEvent) {
         HideOtherMainsExceptThis(anchorPane_FindRooms);
 
         client.StartFindingServers();
@@ -100,16 +91,16 @@ public class Controller {
         TimerTask task = new TimerTask() {
             @Override public void run() {
                 Platform.runLater(() -> {
-                    vBox_RoomList.getChildren().removeAll();
-                    vBox_RoomList.getChildren().clear();
+                    vBox_FRRoomList.getChildren().removeAll();
+                    vBox_FRRoomList.getChildren().clear();
                    /* for (InetAddress inetAddress:list) {
                         Button button = new Button(""+inetAddress.getHostAddress());
                         vBox_RoomList.getChildren().add(button);
                     }*/
-                    for(int i = 0; i < list.size(); i ++){
-                        ServerListCreateServerBox(list.get(i),namelist.get(i));
+                    for(int i = 0; i < inetAddresses.size(); i ++){
+                        ServerListCreateServerBox(inetAddresses.get(i),namelist.get(i));
                     }
-                    list.clear();
+                    inetAddresses.clear();
                     namelist.clear();
                 });
 
@@ -121,9 +112,15 @@ public class Controller {
 
     }
 
+    //ROOM SCREEN
+
+    public void buttonStartGameClick(ActionEvent actionEvent) {
+        HideOtherMainsExceptThis(anchorPane_GameMath);
+    }
+
     public void AddPlayerToList(String name) {
         Platform.runLater(() -> {
-            var width = vBox_RoomList.getWidth();
+            var width = vBox_FRRoomList.getWidth();
             Pane pane = new Pane();
             pane.setPrefSize(width/.90,60);
             pane.getStyleClass().add("serverpane");
@@ -140,10 +137,23 @@ public class Controller {
         });
     }
 
+    public void buttonRoomBackClick(ActionEvent actionEvent) {
+        if(isServerOwner){
+            StopServer();
+        }
+    }
+
+    //FIND ROOM SCREEN
+
+    public void textFieldRoomNameChange(ActionEvent actionEvent) {
+        var textField = (TextField)actionEvent.getSource();
+        Server.ServerName = textField.getText();
+    }
+
     private void ServerListCreateServerBox(InetAddress inetAddress,String roomName){
         String ipAddress = inetAddress.getHostAddress();
 
-        var width = vBox_RoomList.getWidth();
+        var width = vBox_FRRoomList.getWidth();
         Pane pane = new Pane();
         pane.setPrefSize(width/.90,60);
         pane.getStyleClass().add("serverpane");
@@ -157,8 +167,8 @@ public class Controller {
         button.getStyleClass().add("minorbutton");
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
-            JoinARoomButtonClick(e,inetAddress,roomName);
-        }});
+                JoinARoomButtonClick(e,inetAddress,roomName);
+            }});
 
         button.setLayoutX(pane.getPrefWidth()-button.getPrefHeight()-10);
         button.setLayoutY(10);
@@ -169,7 +179,7 @@ public class Controller {
 
 
         pane.getChildren().addAll(button,labelIpAddress,labelRoomName);
-        vBox_RoomList.getChildren().add(pane);
+        vBox_FRRoomList.getChildren().add(pane);
 
     }
 
@@ -197,8 +207,8 @@ public class Controller {
                 System.out.println(e.getMessage());
             }
             HideOtherMainsExceptThis(anchorPane_Room);
-            textField_RoomName.setEditable(false);
-            textField_RoomName.setText(roomName);
+            textField_RRoomName.setEditable(false);
+            textField_RRoomName.setText(roomName);
 
         }
         else return;
@@ -207,18 +217,39 @@ public class Controller {
 
     }
 
+    public void buttonFindRoomBackClick(ActionEvent actionEvent) {
+        HideOtherMainsExceptThis(anchorPane_Play);
+
+        try{
+            client.StopFindingServers();
+            client.StopReceivingInet();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+
+    }
+
+    //GAME MATH SCREEN
+
+
+
+    public void ShowPlayBecauseYouGotKicked() {
+        Platform.runLater(() -> {
+           HideOtherMainsExceptThis(anchorPane_Play);
+        });
+    }
 
 
 
 
 
 
-    ObservableList<InetAddress> list = FXCollections.observableArrayList();
+    ObservableList<InetAddress> inetAddresses = FXCollections.observableArrayList();
     public ObservableList<String> namelist = FXCollections.observableArrayList();
     public void ReceiveData(InetAddress inetAddress){
         System.out.println("Received InetAddress");
         boolean isUnique = true;
-        for (InetAddress address:list) {
+        for (InetAddress address: inetAddresses) {
            if(inetAddress == address){
                isUnique = false;
                break;
@@ -226,11 +257,9 @@ public class Controller {
 
         }
         if(isUnique)
-            list.add(inetAddress);
+            inetAddresses.add(inetAddress);
 
     }
-
-
 
 
 
@@ -252,27 +281,19 @@ public class Controller {
     }
 
 
-    public void textFieldRoomNameChange(ActionEvent actionEvent) {
-        var textField = (TextField)actionEvent.getSource();
-        Server.ServerName = textField.getText();
-    }
-
-
-    public void buttonStartGameClick(ActionEvent actionEvent) {
-        HideOtherMainsExceptThis(anchorPane_GameMath);
-    }
-
-
-
-
 
     public void StartServer(){
         server.StartMainServer();
     }
 
+    public void StopServer(){
+        server.StopMainServer();
+    }
+
     public void StartClient(InetAddress inetAddress){
         client.StartMainClient(inetAddress);
     }
+
 
 
 }
