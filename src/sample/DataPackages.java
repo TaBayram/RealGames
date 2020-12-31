@@ -3,9 +3,9 @@ package sample;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataPackages {
+public class DataPackages implements java.io.Serializable{
 
-    public class Player{
+    public class Player implements java.io.Serializable{
         private int ID;
         private String name;
         private int score;
@@ -65,7 +65,7 @@ public class DataPackages {
 
     }
 
-    public class PlayerList{
+    public class PlayerList implements java.io.Serializable{
         public List<String> getNames() {
             return names;
         }
