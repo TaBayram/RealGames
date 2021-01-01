@@ -244,6 +244,10 @@ public class Server {
 
                         if(packetMathQuestion.isSendingAnswer()){
                             System.out.println("##>Answer from: " +player.getName() + " - "+ packetMathQuestion.getAnswer());
+                            player.setScore((int) Math.round(packetMathQuestion.getPoint()));
+                            player.isSendingScore = true;
+                            ObjectFlushAll(player);
+                            player.isSendingScore = false;
                         }
 
                     }
@@ -255,11 +259,14 @@ public class Server {
 
                         if(packetGameCommand.isEntering()){
                             ObjectFlushAll(packetGameCommand);
-                            nextQuestion();
+
 
                         }
                         else if(packetGameCommand.isExiting()){
                             ObjectFlushAll(packetGameCommand);
+                        }
+                        else if(packetGameCommand.isStarting()){
+                            nextQuestion();
                         }
                     }
 

@@ -98,6 +98,12 @@ public class Client {
                             controller.AddPlayerToList(playerMe,true);
 
                         }
+
+                        else if(packetPlayer.isSendingScore){
+                            controller.ChangeScore(packetPlayer.getName(),packetPlayer.getScore());
+
+                        }
+
                     }
                     //YOU HAVE JOINED THE ROOM AND GETTING THE PLAYER LIST
                     else if(packet.getClass() == DataPackages.PlayerList.class){
@@ -147,15 +153,17 @@ public class Client {
             gameCommand.setExiting(true);
             ObjectFlush(gameCommand);
         }
+        public void StartGame(){
+            DataPackages.GameCommand gameCommand = new DataPackages().new GameCommand();
+            gameCommand.setStarting(true);
+            ObjectFlush(gameCommand);
+        }
 
 
-        public void SendAnswer(double answer){
+        public void SendAnswer(DataPackages.MathQuestion mathQuestion){
             try{
 
-                DataPackages.MathQuestion mathQuestion = new DataPackages().new MathQuestion();
                 mathQuestion.setSendingAnswer(true);
-                mathQuestion.setAnswer(answer);
-
                 ObjectFlush(mathQuestion);
 
 

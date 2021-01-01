@@ -13,10 +13,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.net.InetAddress;
-import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.Vector;
+import java.util.*;
 
 public class Controller {
 
@@ -44,6 +41,9 @@ public class Controller {
     public Button button_RStartGame;
     public Button button_RCancelRoom;
     public Label label_Question;
+    public Label label_GMScore;
+    public Button button_GMSendAnswer1;
+    public VBox vBox_GMPlayer;
 
 
     public void initialize() {
@@ -265,10 +265,17 @@ public class Controller {
         try{
             String gmAnswerText = textField_GMAnswer.getText();
             double answer = Double.parseDouble(gmAnswerText);
-            SendAnswer(answer);
 
             if(answer == mathQuestion.getAnswer()){
-                label_Question.setText("CORRECT SCORE "+mathQuestion.getPoint());
+                label_Question.setText("CORRECT");
+                long seconds = (new Date(System.currentTimeMillis()).getTime()-starTime.getTime())/1000;
+
+                label_GMScore.setText("Completed in " +seconds + " seconds \n    Score: " + Math.round(((10.0/(10.0 + seconds) )*mathQuestion.getPoint())));
+
+
+                Client.playerMe.setScore((int) (Client.playerMe.getScore() + Math.round(((10.0/(10.0 + seconds) )*mathQuestion.getPoint()))));
+                mathQuestion.setPoint(Client.playerMe.getScore());
+                SendAnswer(mathQuestion);
             }
         }
         catch (Exception e){
@@ -286,34 +293,38 @@ public class Controller {
     }
 
     int countDown = 3;
+    Date starTime = new Date(System.currentTimeMillis());
     DataPackages.MathQuestion mathQuestion = new DataPackages().new MathQuestion();
 
     public void ShowGameScreenAndStartTheClock(){
         Platform.runLater(() -> {
             HideOtherMainsExceptThis(anchorPane_GameMath);
-            countDown = 3;
-            TimerTask task = new TimerTask() {
-                @Override public void run() {
-                    Platform.runLater(() -> {
-                        if(countDown <= 0){
-                            label_Question.setText(mathQuestion.getQuestion());
-                            timer_GameClock.cancel();
-                        }
-                        else{
-                            label_Question.setText(countDown+"...");
-                            countDown --;
-                        }
-
-                    });
-
-                }
-            };
-            timer_GameClock = new Timer();
-            timer_GameClock.schedule(task,0,1500);
+            if(isServerOwner) {
+                button_GMSendAnswer1.setDisable(false);
+            }
+            else{
+                button_GMSendAnswer1.setDisable(true);
+            }
+            buttonNextQuestion(null);
+            for (RoomPlayerBox player : roomPlayerBoxes) {
+                Label label = new Label(player.labelName.getText() + ":" + "0");
+                vBox_GMPlayer.getChildren().add(label);
+            }
         });
 
 
 
+    }
+
+    public void ChangeScore(String name, int score){
+        Platform.runLater(() -> {
+        for (Node node : vBox_GMPlayer.getChildren()) {
+            var label = (Label) node;
+            if(label.getText().startsWith(name.trim())){
+                label.setText(name + ":" + score);
+            }
+        }
+        });
     }
 
 
@@ -355,9 +366,30 @@ public class Controller {
 
     }
 
+    public void buttonNextQuestion(ActionEvent actionEvent) {
+            client.mainClientThread.StartGame();
+            countDown = 3;
+            TimerTask task = new TimerTask() {
+                @Override public void run() {
+                    Platform.runLater(() -> {
+                        if(countDown <= 0){
+                            starTime = new Date(System.currentTimeMillis());
+                            label_Question.setText(mathQuestion.getQuestion());
+                            timer_GameClock.cancel();
+                        }
+                        else{
+                            label_Question.setText(countDown+"...");
+                            countDown --;
+                        }
 
+                    });
 
+                }
+            };
+            timer_GameClock = new Timer();
+            timer_GameClock.schedule(task,0,1500);
 
+    }
 
 
     private class RoomPlayerBox{
@@ -428,8 +460,8 @@ public class Controller {
         client.StopMainClient();
     }
 
-    public void SendAnswer(double answer){
-        client.mainClientThread.SendAnswer(answer);
+    public void SendAnswer(DataPackages.MathQuestion mathQuestion){
+        client.mainClientThread.SendAnswer(mathQuestion);
     }
 
 

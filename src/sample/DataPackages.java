@@ -14,6 +14,8 @@ public class DataPackages implements java.io.Serializable{
         private boolean isLeaving = false;
         private boolean isChecking = false;
 
+        public boolean isSendingScore = false;
+
 
         Player(String name){
             this.name = name;
@@ -62,6 +64,14 @@ public class DataPackages implements java.io.Serializable{
 
         public void setID(int ID) {
             this.ID = ID;
+        }
+
+        public int getScore() {
+            return score;
+        }
+
+        public void setScore(int score) {
+            this.score = score;
         }
     }
 

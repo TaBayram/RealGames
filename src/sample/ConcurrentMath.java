@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 public class ConcurrentMath {
-    public int level;
+    public int level = 0;
     public double levelScore;
     public String question;
     public double answer;
@@ -19,7 +19,7 @@ public class ConcurrentMath {
     public void CreateQuestion(){
         List<Double> numbers = new ArrayList<>();
 
-        int numberAmount = level/5 + 1;
+        int numberAmount = level/5 + 2;
         for(int i = 0; i < numberAmount; i++){
             double number = level*5 + random.nextInt(level*15);
             numbers.add(number);
@@ -31,8 +31,9 @@ public class ConcurrentMath {
         }
 
         String question = "";
-        for(int i = 0; i < numbers.size()-1; i++){
-            question += numbers.get(i) + "+";
+        for(int i = 0; i < numbers.size(); i++){
+            question += Math.round(numbers.get(i));
+            if(i != numbers.size()-1) question += "+";
         }
 
         answer = result;
