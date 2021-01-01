@@ -124,9 +124,7 @@ public class Client {
                         else if(packetGameCommand.isExiting()){
                             controller.ShowPlayBecauseYouGotKicked();
                         }
-                        else if(packetGameCommand.isStarting()){
-                            controller.next();
-                        }
+
                     }
 
                     //MATH
@@ -135,6 +133,7 @@ public class Client {
 
                         if(packetMathQuestion.isSendingQuestion()){
                             controller.mathQuestion = packetMathQuestion;
+                            controller.next();
                         }
 
                     }

@@ -266,6 +266,7 @@ public class Server {
                             ObjectFlushAll(packetGameCommand);
                         }
                         else if(packetGameCommand.isStarting()){
+                            System.out.println("Hey");
                             nextQuestion();
                         }
                     }
