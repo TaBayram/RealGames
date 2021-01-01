@@ -217,7 +217,7 @@ public class Server {
 
         @Override
         public void run() {
-            while(socket.isConnected() && canRun) {
+            while(!socket.isClosed() && canRun) {
                 try{
                     objectInputStream = new ObjectInputStream((socket.getInputStream()));
                     var packet = objectInputStream.readObject();
@@ -241,7 +241,7 @@ public class Server {
                     }
                 }
                 catch(Exception exception){
-
+                    System.out.println("##>Error: ");
                 }
 
             }

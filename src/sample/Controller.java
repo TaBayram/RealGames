@@ -84,18 +84,16 @@ public class Controller {
             StartServer();
             isServerOwner = true;
             HideOtherMainsExceptThis(anchorPane_Room);
-            AddPlayerToList(Client.playerMe,false);
 
         }
 
     }
 
+    Timer timer;
+
     public void buttonSearchRoomClick(ActionEvent actionEvent) {
         HideOtherMainsExceptThis(anchorPane_FindRooms);
-
-        client.StartFindingServers();
-        client.StartReceivingInet(this);
-
+        StartSearchingServers();
 
         TimerTask task = new TimerTask() {
             @Override public void run() {
@@ -115,7 +113,8 @@ public class Controller {
 
             }
         };
-        Timer timer = new Timer();
+
+        timer = new Timer();
         timer.schedule(task,2000L,8000L);
 
 
@@ -222,7 +221,6 @@ public class Controller {
 
             StartClient(inetAddress);
 
-
             HideOtherMainsExceptThis(anchorPane_Room);
             textField_RRoomName.setEditable(false);
             textField_RRoomName.setText(roomName);
@@ -236,14 +234,7 @@ public class Controller {
 
     public void buttonFindRoomBackClick(ActionEvent actionEvent) {
         HideOtherMainsExceptThis(anchorPane_Play);
-
-        try{
-            client.StopFindingServers();
-            client.StopReceivingInet();
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-
+        StopSearchingServers();
     }
 
     //GAME MATH SCREEN
@@ -351,6 +342,22 @@ public class Controller {
 
     }
 
+    public void StartSearchingServers(){
+        client.StartFindingServers();
+        client.StartReceivingInet(this);
+    }
+
+    public void StopSearchingServers(){
+        timer.cancel();
+        try{
+            client.StopFindingServers();
+            client.StopReceivingInet();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+
+    }
+
     public void StartServer(){
         server.StartMainServer();
     }
@@ -360,12 +367,7 @@ public class Controller {
     }
 
     public void StartClient(InetAddress inetAddress){
-        try {
-            client.StopFindingServers();
-            client.StopReceivingInet();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        StopSearchingServers();
         client.StartMainClient(inetAddress);
     }
 

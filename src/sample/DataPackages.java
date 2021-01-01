@@ -10,9 +10,9 @@ public class DataPackages implements java.io.Serializable{
         private String name;
         private int score;
 
-        private boolean isJoining;
-        private boolean isLeaving;
-        private boolean isChecking;
+        private boolean isJoining = false;
+        private boolean isLeaving = false;
+        private boolean isChecking = false;
 
 
         Player(String name){

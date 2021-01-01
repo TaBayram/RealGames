@@ -85,7 +85,7 @@ public class Client {
                         }
                         else if(packetPlayer.isLeaving()){
 
-                            if(packetPlayer.getName().trim().equals(player.getName().trim())){
+                            if(packetPlayer.getID() == playerMe.getID()){
                                 System.out.println(">>> Getting Kicked");
                                 controller.ShowPlayBecauseYouGotKicked();
                                 socket.close();
