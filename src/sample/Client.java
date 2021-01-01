@@ -98,6 +98,7 @@ public class Client {
                             }
                         }
                         else if(packetPlayer.isChecking()){
+                            System.out.println("Hey");
                             player.setID(packetPlayer.getID());
                             controller.AddPlayerToList(playerMe,true);
 

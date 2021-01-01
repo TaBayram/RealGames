@@ -348,7 +348,7 @@ public class Controller {
     }
 
     public void StopSearchingServers(){
-        timer.cancel();
+        if(timer != null) timer.cancel();
         try{
             client.StopFindingServers();
             client.StopReceivingInet();

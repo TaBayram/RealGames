@@ -241,7 +241,7 @@ public class Server {
                     }
                 }
                 catch(Exception exception){
-                    System.out.println("##>Error: ");
+                    System.out.println("##>Error: "+exception.getMessage());
                 }
 
             }
