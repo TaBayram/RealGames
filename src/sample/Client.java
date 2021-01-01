@@ -12,7 +12,6 @@ public class Client {
     private boolean mainClientThreadCanRun = false;
 
     public static String serverName = "";
-
     public static DataPackages.Player playerMe = new DataPackages().new Player();
 
 
@@ -49,7 +48,6 @@ public class Client {
         public Socket socket;
         public ObjectOutputStream objectOutputStream;
         public ObjectInputStream objectInputStream;
-        public DataPackages.Player player= playerMe;
         public DataPackages.PlayerList playerList= new DataPackages().new PlayerList();
 
         MainClient(InetAddress inetAddress){
@@ -63,11 +61,9 @@ public class Client {
                 socket = new Socket(inetAddress, 6666);
 
                 //SEND YOURSELF AS JOINING PLAYER IN THE ROOM
-                player.setJoining(true);
-                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                objectOutputStream.writeObject(player);
-                objectOutputStream.flush();
-                player.setJoining(false);
+                playerMe.setJoining(true);
+                ObjectFlush(playerMe);
+                playerMe.setJoining(false);
 
 
                 while (mainClientThreadCanRun) {
@@ -98,8 +94,7 @@ public class Client {
                             }
                         }
                         else if(packetPlayer.isChecking()){
-                            System.out.println("Hey");
-                            player.setID(packetPlayer.getID());
+                            playerMe.setID(packetPlayer.getID());
                             controller.AddPlayerToList(playerMe,true);
 
                         }
@@ -113,12 +108,46 @@ public class Client {
                         this.playerList = packetPlayer;
                     }
 
+                    //GAME
+                    else if(packet.getClass() == DataPackages.GameCommand.class){
+                        var packetGameCommand = (DataPackages.GameCommand)(packet);
+
+                        if(packetGameCommand.isEntering()){
+                            controller.ShowGameScreenAndStartTheClock();
+                        }
+                        else if(packetGameCommand.isExiting()){
+                            controller.ShowPlayBecauseYouGotKicked();
+                        }
+                    }
+
+                    //MATH
+                    else if(packet.getClass() == DataPackages.MathQuestion.class){
+                        var packetMathQuestion = (DataPackages.MathQuestion)(packet);
+
+                        if(packetMathQuestion.isSendingQuestion()){
+                            controller.mathQuestion = packetMathQuestion;
+                        }
+
+                    }
+
                 }
 
             } catch (Exception e) {
                 System.out.println(">>>Error " +e);
             }
         }
+
+        public void EnterGame(){
+            DataPackages.GameCommand gameCommand = new DataPackages().new GameCommand();
+            gameCommand.setEntering(true);
+            ObjectFlush(gameCommand);
+        }
+        public void ExitGame(){
+            DataPackages.GameCommand gameCommand = new DataPackages().new GameCommand();
+            gameCommand.setExiting(true);
+            ObjectFlush(gameCommand);
+        }
+
 
         public void SendAnswer(double answer){
             try{
@@ -127,11 +156,7 @@ public class Client {
                 mathQuestion.setSendingAnswer(true);
                 mathQuestion.setAnswer(answer);
 
-                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                objectOutputStream.writeObject(mathQuestion);
-                objectOutputStream.flush();
-
-
+                ObjectFlush(mathQuestion);
 
 
             }
@@ -145,10 +170,9 @@ public class Client {
         public void LeaveRoom(){
             try{
 
-                player.setLeaving(true);
-                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                objectOutputStream.writeObject(player);
-                objectOutputStream.flush();
+                playerMe.setLeaving(true);
+                ObjectFlush(playerMe);
+                playerMe.setLeaving(false);
 
             }
             catch (Exception exception){
@@ -157,11 +181,25 @@ public class Client {
 
         }
 
+        private void ObjectFlush(Object object){
+
+            try{
+                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                objectOutputStream.writeObject(object);
+                objectOutputStream.flush();
+            }
+            catch (Exception exception){
+                System.out.println(">>>Error Flush: "+exception.getMessage());
+            }
+
+
+        }
+
     }
 
 
 
-
+    /* ------------------- FIND SERVER -------------------*/
 
     FindServers findServersThread = new FindServers();
     private boolean findServersThreadCanRun = false;

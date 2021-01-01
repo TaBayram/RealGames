@@ -84,6 +84,50 @@ public class DataPackages implements java.io.Serializable{
 
     }
 
+    public class GameCommand implements java.io.Serializable{
+        public boolean isEntering() {
+            return isEntering;
+        }
+
+        public void setEntering(boolean entering) {
+            isEntering = entering;
+        }
+
+        public boolean isExiting() {
+            return isExiting;
+        }
+
+        public void setExiting(boolean exiting) {
+            isExiting = exiting;
+        }
+
+        public boolean isStarting() {
+            return isStarting;
+        }
+
+        public void setStarting(boolean starting) {
+            isStarting = starting;
+        }
+
+        public boolean isEnding() {
+            return isEnding;
+        }
+
+        public void setEnding(boolean ending) {
+            isEnding = ending;
+        }
+
+        private boolean isEntering = false;
+        private boolean isExiting = false;
+
+        private boolean isStarting = false;
+        private boolean isEnding = false;
+
+        boolean NextLevel = false;
+
+
+    }
+
     public class MathQuestion implements  java.io.Serializable{
 
         private String question;

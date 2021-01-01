@@ -13,19 +13,25 @@ import java.util.logging.Logger;
 public class Server {
     Controller controller;
 
-    Server(Controller controller){
-        this.controller = controller;
-
-    }
-
+    MainServer mainServerThread = new MainServer();
+    private boolean mainServerThreadCanRun = false;
 
     public static String ServerName = "Room";
     public static InetAddress serverAddress;
 
     final static List<ConnectedSocketsThread> clients = new ArrayList<>();
 
-    MainServer mainServerThread = new MainServer();
-    private boolean mainServerThreadCanRun = false;
+    private ConcurrentMath concurrentMath = new ConcurrentMath();
+
+
+
+    Server(Controller controller){
+        this.controller = controller;
+
+    }
+
+
+
 
 
 
@@ -51,7 +57,7 @@ public class Server {
             }
         }
         catch(Exception exception){
-
+            exception.printStackTrace();
         }
 
         try {
@@ -197,7 +203,9 @@ public class Server {
 
 
 
+
     Random random = new Random();
+
 
     public class ConnectedSocketsThread extends Thread{
         private boolean canRun = true;
@@ -239,6 +247,23 @@ public class Server {
                         }
 
                     }
+
+
+                    //GAME
+                    else if(packet.getClass() == DataPackages.GameCommand.class){
+                        var packetGameCommand = (DataPackages.GameCommand)(packet);
+
+                        if(packetGameCommand.isEntering()){
+                            ObjectFlushAll(packetGameCommand);
+                            nextQuestion();
+
+                        }
+                        else if(packetGameCommand.isExiting()){
+                            ObjectFlushAll(packetGameCommand);
+                        }
+                    }
+
+
                 }
                 catch(Exception exception){
                     System.out.println("##>Error: "+exception.getMessage());
@@ -271,9 +296,79 @@ public class Server {
                 System.out.println("##>Error "+ e.getMessage());
             }
         }
+
+        private void nextQuestion(){
+            concurrentMath.level ++;
+            concurrentMath.CreateQuestion();
+            DataPackages.MathQuestion mathQuestion = new DataPackages().new MathQuestion();
+            mathQuestion.setAnswer(concurrentMath.answer);
+            mathQuestion.setQuestion(concurrentMath.question);
+            mathQuestion.setPoint(concurrentMath.levelScore);
+            mathQuestion.setSendingQuestion(true);
+
+            ObjectFlushAll(mathQuestion);
+        }
+
+        private void ObjectFlushSelf(Object object){
+            try{
+                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                objectOutputStream.writeObject(object);
+                objectOutputStream.flush();
+            }
+            catch (Exception exception){
+                System.out.println(">>>Error Flush: "+exception.getMessage());
+            }
+
+
+        }
+
+        private void ObjectFlushOthers(Object object){
+
+            try{
+                for(ConnectedSocketsThread socketsThread: clients){
+                    if(!socketsThread.socket.isClosed()){
+                        if(socketsThread != this){
+                            objectOutputStream = new ObjectOutputStream(socketsThread.socket.getOutputStream());
+                            objectOutputStream.writeObject(object);
+                            objectOutputStream.flush();
+
+                        }
+                    }
+                }
+
+            }
+            catch (Exception exception){
+                System.out.println(">>>Error Flush: "+exception.getMessage());
+            }
+
+
+        }
+
+        private void ObjectFlushAll(Object object){
+
+            try{
+                for(ConnectedSocketsThread socketsThread: clients){
+                    if(!socketsThread.socket.isClosed()){
+                        objectOutputStream = new ObjectOutputStream(socketsThread.socket.getOutputStream());
+                        objectOutputStream.writeObject(object);
+                        objectOutputStream.flush();
+                    }
+                }
+            }
+            catch (Exception exception){
+                System.out.println(">>>Error Flush: "+exception.getMessage());
+            }
+
+
+        }
+
     }
 
 
+
+
+
+    /* --------------------- DISCOVER ME --------------------- */
     public static class DiscoveryThread implements Runnable {
         public static DatagramSocket datagramSocket;
 
@@ -327,6 +422,8 @@ public class Server {
 
             private static final DiscoveryThread INSTANCE = new DiscoveryThread();
         }
+
+
 
     }
 

@@ -41,6 +41,9 @@ public class Controller {
 
     public AnchorPane anchorPane_GameMath;
     public TextField textField_GMAnswer;
+    public Button button_RStartGame;
+    public Button button_RCancelRoom;
+    public Label label_Question;
 
 
     public void initialize() {
@@ -84,12 +87,17 @@ public class Controller {
             StartServer();
             isServerOwner = true;
             HideOtherMainsExceptThis(anchorPane_Room);
+            textField_RRoomName.setEditable(true);
+            textField_RRoomName.setText("Room");
+            button_RCancelRoom.setText("Cancel Room");
+            button_RStartGame.setDisable(false);
 
         }
 
     }
 
-    Timer timer;
+    Timer timer_FindServer;
+    Timer timer_GameClock;
 
     public void buttonSearchRoomClick(ActionEvent actionEvent) {
         HideOtherMainsExceptThis(anchorPane_FindRooms);
@@ -114,53 +122,10 @@ public class Controller {
             }
         };
 
-        timer = new Timer();
-        timer.schedule(task,2000L,8000L);
+        timer_FindServer = new Timer();
+        timer_FindServer.schedule(task,2000L,8000L);
 
 
-    }
-
-    //ROOM SCREEN
-    Vector<RoomPlayerBox> roomPlayerBoxes = new Vector<>();
-
-
-    public void buttonStartGameClick(ActionEvent actionEvent) {
-        HideOtherMainsExceptThis(anchorPane_GameMath);
-    }
-
-    public void AddPlayerToList(DataPackages.Player player,boolean isAfter) {
-        Platform.runLater(() -> {
-            RoomPlayerBox roomPlayerBox = new RoomPlayerBox(vBox_RoomPlayerList, player);
-            roomPlayerBoxes.add(roomPlayerBox);
-            if(isAfter) listView_RLog.getItems().add(player.getName() +" has joined!");
-
-        });
-    }
-
-    public void RemovePlayerFromList(DataPackages.Player player) {
-        Platform.runLater(() -> {
-            for(RoomPlayerBox roomPlayerBox: roomPlayerBoxes){
-                if(roomPlayerBox.player.getID() == player.getID()){
-                    roomPlayerBox.Remove();
-                    listView_RLog.getItems().add(player.getName() +" has left!");
-                    break;
-                }
-            }
-
-
-        });
-    }
-
-    public void buttonRoomBackClick(ActionEvent actionEvent) {
-        if(isServerOwner){
-            StopServer();
-            isServerOwner = false;
-        }
-        else{
-            StopClient();
-            HideOtherMainsExceptThis(anchorPane_Play);
-
-        }
     }
 
     //FIND ROOM SCREEN
@@ -221,9 +186,13 @@ public class Controller {
 
             StartClient(inetAddress);
 
+
             HideOtherMainsExceptThis(anchorPane_Room);
+
             textField_RRoomName.setEditable(false);
             textField_RRoomName.setText(roomName);
+            button_RCancelRoom.setText("Leave Room");
+            button_RStartGame.setDisable(true);
 
         }
         else return;
@@ -237,6 +206,58 @@ public class Controller {
         StopSearchingServers();
     }
 
+
+    //ROOM SCREEN
+    Vector<RoomPlayerBox> roomPlayerBoxes = new Vector<>();
+
+
+    public void buttonStartGameClick(ActionEvent actionEvent) {
+        if(isServerOwner){
+            client.mainClientThread.EnterGame();
+
+            //HideOtherMainsExceptThis(anchorPane_GameMath);
+
+
+        }
+
+    }
+
+    public void AddPlayerToList(DataPackages.Player player,boolean isAfter) {
+        Platform.runLater(() -> {
+            RoomPlayerBox roomPlayerBox = new RoomPlayerBox(vBox_RoomPlayerList, player);
+            roomPlayerBoxes.add(roomPlayerBox);
+            if(isAfter) listView_RLog.getItems().add(player.getName() +" has joined!");
+
+        });
+    }
+
+    public void RemovePlayerFromList(DataPackages.Player player) {
+        Platform.runLater(() -> {
+            for(RoomPlayerBox roomPlayerBox: roomPlayerBoxes){
+                if(roomPlayerBox.player.getID() == player.getID()){
+                    roomPlayerBox.Remove();
+                    listView_RLog.getItems().add(player.getName() +" has left!");
+                    break;
+                }
+            }
+
+
+        });
+    }
+
+    public void buttonRoomBackClick(ActionEvent actionEvent) {
+        if(isServerOwner){
+            StopServer();
+            isServerOwner = false;
+        }
+        else{
+            StopClient();
+            HideOtherMainsExceptThis(anchorPane_Play);
+
+        }
+    }
+
+
     //GAME MATH SCREEN
 
     public void buttonSendAnswer(ActionEvent actionEvent) {
@@ -245,6 +266,10 @@ public class Controller {
             String gmAnswerText = textField_GMAnswer.getText();
             double answer = Double.parseDouble(gmAnswerText);
             SendAnswer(answer);
+
+            if(answer == mathQuestion.getAnswer()){
+                label_Question.setText("CORRECT SCORE "+mathQuestion.getPoint());
+            }
         }
         catch (Exception e){
             System.out.println("¤¤¤Parse Error: " + e.getMessage());
@@ -254,14 +279,42 @@ public class Controller {
     }
 
 
-
     public void ShowPlayBecauseYouGotKicked() {
         Platform.runLater(() -> {
            HideOtherMainsExceptThis(anchorPane_Play);
         });
     }
 
+    int countDown = 3;
+    DataPackages.MathQuestion mathQuestion = new DataPackages().new MathQuestion();
 
+    public void ShowGameScreenAndStartTheClock(){
+        Platform.runLater(() -> {
+            HideOtherMainsExceptThis(anchorPane_GameMath);
+            countDown = 3;
+            TimerTask task = new TimerTask() {
+                @Override public void run() {
+                    Platform.runLater(() -> {
+                        if(countDown <= 0){
+                            label_Question.setText(mathQuestion.getQuestion());
+                            timer_GameClock.cancel();
+                        }
+                        else{
+                            label_Question.setText(countDown+"...");
+                            countDown --;
+                        }
+
+                    });
+
+                }
+            };
+            timer_GameClock = new Timer();
+            timer_GameClock.schedule(task,0,1500);
+        });
+
+
+
+    }
 
 
 
@@ -348,7 +401,7 @@ public class Controller {
     }
 
     public void StopSearchingServers(){
-        if(timer != null) timer.cancel();
+        if(timer_FindServer != null) timer_FindServer.cancel();
         try{
             client.StopFindingServers();
             client.StopReceivingInet();
