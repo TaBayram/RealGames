@@ -33,12 +33,26 @@ public class Client {
 
     public void StopMainClient() {
         mainClientThreadCanRun = false;
+        try {
+            if (mainClientThread.objectInputStream != null)
+                mainClientThread.objectInputStream.close();
+            if (mainClientThread.objectOutputStream != null)
+                mainClientThread.objectOutputStream.close();
+            mainClientThread.socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
 
     public class MainClient extends Thread{
         public InetAddress inetAddress;
+        public Socket socket;
+        public ObjectOutputStream objectOutputStream;
+        public ObjectInputStream objectInputStream;
+        public DataPackages.Player player= new DataPackages().new Player();
+        public DataPackages.PlayerList playerList= new DataPackages().new PlayerList();
 
         MainClient(InetAddress inetAddress){
             this.inetAddress = inetAddress;
@@ -48,18 +62,19 @@ public class Client {
         @Override
         public void run() {
             try {
-                Socket socket = new Socket(inetAddress, 6666);
+                socket = new Socket(inetAddress, 6666);
 
                 //SEND YOURSELF AS JOINING PLAYER IN THE ROOM
-                DataPackages.Player newPlayer = new DataPackages().new Player(playerName);
-                newPlayer.setJoining(true);
-                ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                objectOutputStream.writeObject(newPlayer);
+                player = new DataPackages().new Player(playerName);
+                player.setJoining(true);
+                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                objectOutputStream.writeObject(player);
                 objectOutputStream.flush();
+                player.setJoining(false);
 
 
-                while (true) {
-                    var objectInputStream = new ObjectInputStream(socket.getInputStream());
+                while (mainClientThreadCanRun) {
+                    objectInputStream = new ObjectInputStream(socket.getInputStream());
                     var packet = objectInputStream.readObject();
 
                     if(packet.getClass() == DataPackages.Player.class){
@@ -72,10 +87,20 @@ public class Client {
 
                         }
                         else if(packetPlayer.isLeaving()){
-                            System.out.println(">>> Getting Kicked");
-                            controller.ShowPlayBecauseYouGotKicked();
-                            socket.close();
-                            break;
+
+                            if(packetPlayer == player){
+                                System.out.println(">>> Getting Kicked");
+                                controller.ShowPlayBecauseYouGotKicked();
+                                socket.close();
+                                break;
+                            }
+                            else{
+                                controller.RemovePlayerFromList(packetPlayer.getName());
+                                System.out.println(">>> Player has left!");
+
+                            }
+
+
                         }
                     }
                     //YOU HAVE JOINED THE ROOM AND GETTING THE PLAYER LIST
@@ -84,6 +109,7 @@ public class Client {
                         for (String player: packetPlayer.getNames()) {
                             controller.AddPlayerToList(player);
                         }
+                        this.playerList = packetPlayer;
                     }
 
                 }
@@ -92,6 +118,29 @@ public class Client {
                 System.out.println(">>>Error " +e);
             }
         }
+
+        public void SendAnswer(double answer){
+            try{
+
+                DataPackages.MathQuestion mathQuestion = new DataPackages().new MathQuestion();
+                mathQuestion.setSendingAnswer(true);
+                mathQuestion.setAnswer(answer);
+
+                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                objectOutputStream.writeObject(mathQuestion);
+                objectOutputStream.flush();
+
+
+
+
+            }
+            catch (Exception exception){
+                System.out.println(">>>Error Answer: "+exception.getMessage());
+            }
+
+
+        }
+
     }
 
 

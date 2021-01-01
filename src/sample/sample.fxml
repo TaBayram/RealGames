@@ -34,7 +34,7 @@
             <TextField fx:id="textField_PJoinRoomID" layoutX="241.0" layoutY="308.0" promptText="Enter The ID" />
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPane_Room" layoutX="10.0" layoutY="10.0" opacity="0.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
+      <AnchorPane fx:id="anchorPane_Room" layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
          <children>
             <Label layoutX="65.0" layoutY="66.0" text="Room">
                <font>
@@ -43,15 +43,16 @@
             </Label>
             <Button fx:id="button_RStartGame" layoutX="379.0" layoutY="521.0" mnemonicParsing="false" onAction="#buttonStartGameClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Start Game" />
             <Button fx:id="button_RCancelRoom" layoutX="164.0" layoutY="521.0" mnemonicParsing="false" onAction="#buttonRoomBackClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Cancel Room" />
-            <TextField fx:id="textField_RRoomName" alignment="CENTER" layoutX="362.0" layoutY="73.0" onAction="#textFieldRoomNameChange" prefHeight="43.0" prefWidth="217.0" promptText="Enter Room Name" text="Room">
+            <TextField fx:id="textField_RRoomName" alignment="CENTER" layoutX="362.0" layoutY="73.0" onAction="#textFieldRoomNameChange" prefHeight="43.0" prefWidth="217.0" promptText="Enter Room Name" text="Room" AnchorPane.leftAnchor="350.0" AnchorPane.rightAnchor="25.0">
                <font>
                   <Font size="27.0" />
                </font>
             </TextField>
             <VBox fx:id="vBox_RoomPlayerList" alignment="CENTER" layoutX="48.0" layoutY="139.0" prefHeight="352.0" prefWidth="159.0" spacing="5.0" />
+            <ListView fx:id="listView_RLog" prefHeight="362.0" prefWidth="171.0" AnchorPane.bottomAnchor="150.0" AnchorPane.leftAnchor="350.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="175.0" />
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPane_FindRooms" layoutX="10.0" layoutY="10.0" opacity="0.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
+      <AnchorPane fx:id="anchorPane_FindRooms" disable="true" layoutX="10.0" layoutY="10.0" opacity="0.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
          <children>
             <Label layoutX="65.0" layoutY="66.0" text="Games">
                <font>
@@ -63,18 +64,19 @@
             <VBox fx:id="vBox_FRRoomList" alignment="CENTER" layoutX="48.0" layoutY="139.0" prefHeight="352.0" prefWidth="159.0" spacing="10.0" />
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPane_GameMath" layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
+      <AnchorPane fx:id="anchorPane_GameMath" disable="true" layoutX="10.0" layoutY="10.0" opacity="0.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
          <children>
             <Label layoutX="155.0" layoutY="28.0" text="Math">
                <font>
                   <Font name="Goudy Old Style Bold" size="49.0" />
                </font>
             </Label>
-            <Button fx:id="button_GMSendAnswer" layoutX="110.0" layoutY="441.0" mnemonicParsing="false" onAction="#buttonSearchRoomClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Send!">
+            <Button fx:id="button_GMSendAnswer" layoutX="110.0" layoutY="441.0" mnemonicParsing="false" onAction="#buttonSendAnswer" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Send!">
                <font>
                   <Font size="21.0" />
-               </font></Button>
-            <TextField fx:id="textField_GMAnswer" layoutX="77.0" layoutY="354.0" prefHeight="57.0" prefWidth="265.0" promptText="Enter Your Answer" />
+               </font>
+            </Button>
+            <TextField fx:id="textField_GMAnswer" layoutX="77.0" layoutY="354.0" onAction="#buttonSendAnswer" prefHeight="57.0" prefWidth="265.0" promptText="Enter Your Answer" />
             <Label alignment="CENTER" layoutX="32.0" layoutY="149.0" prefHeight="105.0" prefWidth="354.0" text="3 + 2">
                <font>
                   <Font name="Goudy Old Style Bold" size="49.0" />

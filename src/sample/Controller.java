@@ -6,10 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -19,22 +16,32 @@ import java.net.InetAddress;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Vector;
 
 public class Controller {
 
+    public StackPane stackPane_Main;
 
     public AnchorPane anchorPane_MainMenu;
     public Button button_MMPlay;
     public Button button_MMOptions;
     public Button button_MMQuit;
+
+
     public AnchorPane anchorPane_Play;
-    public StackPane stackPane_Main;
-    public VBox vBox_FRRoomList;
+
     public AnchorPane anchorPane_FindRooms;
+    public VBox vBox_FRRoomList;
+
+
     public AnchorPane anchorPane_Room;
     public TextField textField_RRoomName;
     public VBox vBox_RoomPlayerList;
+    public ListView listView_RLog;
+
     public AnchorPane anchorPane_GameMath;
+    public TextField textField_GMAnswer;
+
 
     public void initialize() {
         HideOtherMainsExceptThis(anchorPane_MainMenu);
@@ -47,6 +54,8 @@ public class Controller {
     Server server;
 
     boolean isServerOwner = false;
+
+
 
     //MAIN MENU SCREEN
 
@@ -113,6 +122,8 @@ public class Controller {
     }
 
     //ROOM SCREEN
+    Vector<RoomPlayerBox> roomPlayerBoxes = new Vector<>();
+
 
     public void buttonStartGameClick(ActionEvent actionEvent) {
         HideOtherMainsExceptThis(anchorPane_GameMath);
@@ -120,19 +131,23 @@ public class Controller {
 
     public void AddPlayerToList(String name) {
         Platform.runLater(() -> {
-            var width = vBox_FRRoomList.getWidth();
-            Pane pane = new Pane();
-            pane.setPrefSize(width/.90,60);
-            pane.getStyleClass().add("serverpane");
+            RoomPlayerBox roomPlayerBox = new RoomPlayerBox(vBox_RoomPlayerList, name);
+            roomPlayerBoxes.add(roomPlayerBox);
+            listView_RLog.getItems().add(name +" has joined!");
 
-            Label labelPlayerName = new Label(name);
-            labelPlayerName.getStyleClass().add("minortext");
+        });
+    }
 
-            labelPlayerName.setLayoutX(5);
-            labelPlayerName.setLayoutY(5);
+    public void RemovePlayerFromList(String name) {
+        Platform.runLater(() -> {
+            for(RoomPlayerBox roomPlayerBox: roomPlayerBoxes){
+                if(roomPlayerBox.labelName.getText() == name){
+                    roomPlayerBox.Remove();
+                    listView_RLog.getItems().add(name +" has left!");
+                    break;
+                }
+            }
 
-            pane.getChildren().addAll(labelPlayerName);
-            vBox_RoomPlayerList.getChildren().add(pane);
 
         });
     }
@@ -140,6 +155,12 @@ public class Controller {
     public void buttonRoomBackClick(ActionEvent actionEvent) {
         if(isServerOwner){
             StopServer();
+            isServerOwner = true;
+        }
+        else{
+            StopClient();
+            HideOtherMainsExceptThis(anchorPane_Play);
+
         }
     }
 
@@ -231,6 +252,20 @@ public class Controller {
 
     //GAME MATH SCREEN
 
+    public void buttonSendAnswer(ActionEvent actionEvent) {
+
+        try{
+            String gmAnswerText = textField_GMAnswer.getText();
+            double answer = Double.parseDouble(gmAnswerText);
+            SendAnswer(answer);
+        }
+        catch (Exception e){
+            System.out.println("¤¤¤Parse Error: " + e.getMessage());
+        }
+
+
+    }
+
 
 
     public void ShowPlayBecauseYouGotKicked() {
@@ -282,6 +317,39 @@ public class Controller {
 
 
 
+
+
+
+    private class RoomPlayerBox{
+        Pane paneMain = new Pane();
+        Label labelName = new Label();
+        VBox parent = new VBox();
+
+        RoomPlayerBox(VBox parent,String name){
+            var width = parent.getWidth();
+            this.parent = parent;
+
+            paneMain.setPrefSize(width/.90,60);
+            paneMain.getStyleClass().add("serverpane");
+
+            labelName = new Label(name);
+            labelName.getStyleClass().add("minortext");
+
+            labelName.setLayoutX(5);
+            labelName.setLayoutY(5);
+
+            paneMain.getChildren().addAll(labelName);
+
+            parent.getChildren().add(paneMain);
+        }
+
+        public void Remove(){
+            parent.getChildren().remove(paneMain);
+        }
+
+
+    }
+
     public void StartServer(){
         server.StartMainServer();
     }
@@ -292,6 +360,14 @@ public class Controller {
 
     public void StartClient(InetAddress inetAddress){
         client.StartMainClient(inetAddress);
+    }
+
+    public void StopClient(){
+        client.StopMainClient();
+    }
+
+    public void SendAnswer(double answer){
+        client.mainClientThread.SendAnswer(answer);
     }
 
 

@@ -132,11 +132,6 @@ public class Server {
                         }
                     }
 
-
-
-
-
-
                 }
 
 
@@ -144,6 +139,24 @@ public class Server {
             catch(Exception e){
                 System.out.println("###Error " + e);
             }
+        }
+
+        public void SendLeavingPlayerPacket(ConnectedSocketsThread connectedSocketsThread){
+            for (ConnectedSocketsThread connectedSocketsThread2: clients) {
+                if(connectedSocketsThread != connectedSocketsThread2){
+                    try {
+                        objectOutputStream = new ObjectOutputStream(connectedSocketsThread.socket.getOutputStream());
+                        objectOutputStream.writeObject(connectedSocketsThread.player);
+                        objectOutputStream.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+                }
+
+            }
+
         }
     }
 
@@ -154,11 +167,40 @@ public class Server {
     public class ConnectedSocketsThread extends Thread{
         public DataPackages.Player player = new DataPackages().new Player();
         public Socket socket;
-        DataInputStream dataInputStream;
+        ObjectInputStream objectInputStream;
 
         ConnectedSocketsThread(DataPackages.Player player, Socket socket){
             this.player = player;
             this.socket = socket;
+        }
+
+        @Override
+        public void run() {
+            while(socket.isConnected()) {
+                try{
+                    objectInputStream = new ObjectInputStream((socket.getInputStream()));
+                    var packet = objectInputStream.readObject();
+
+                    if(packet.getClass() == DataPackages.Player.class) {
+                        var packetPlayer = (DataPackages.Player) (packet);
+
+
+                    }
+                    else if(packet.getClass() == DataPackages.MathQuestion.class){
+                        var packetMathQuestion = (DataPackages.MathQuestion) (packet);
+
+                        if(packetMathQuestion.isSendingAnswer()){
+                            System.out.println("##>Answer from: " +player.getName() + " - "+ packetMathQuestion.getAnswer());
+                        }
+
+                    }
+                }
+                catch(Exception exception){
+
+                }
+
+            }
+            Disconnect();
         }
 
         public void Disconnect(){
@@ -167,26 +209,19 @@ public class Server {
                 var objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
                 objectOutputStream.writeObject(player);
                 objectOutputStream.flush();
+
+                mainServerThread.SendLeavingPlayerPacket(this);
+
+
+                if (objectInputStream != null)
+                    objectInputStream.close();
+                if (objectOutputStream != null)
+                    objectOutputStream.close();
+                socket.close();
             }
             catch (Exception e){
                 System.out.println("##>Error "+ e.getMessage());
             }
-        }
-
-        @Override
-        public void run() {
-            while(socket.isConnected()) {
-                try{
-                    dataInputStream = new DataInputStream((socket.getInputStream()));
-                    String str = (String) dataInputStream.readUTF();
-                    System.out.println(str);
-                }
-                catch(Exception exception){
-
-                }
-
-            }
-            //ANNOUNCE THE DC
         }
     }
 
