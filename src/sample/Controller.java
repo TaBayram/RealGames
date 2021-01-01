@@ -218,20 +218,11 @@ public class Controller {
             else{
                 Client.playerMe.setName(result.get());
             }
-            try {
-                client.StopFindingServers();
-                client.StopReceivingInet();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+
+
             StartClient(inetAddress);
-            AddPlayerToList(client.playerMe,true);
-            try{
-                client.StopFindingServers();
-                client.StopReceivingInet();
-            }catch (Exception e){
-                System.out.println(e.getMessage());
-            }
+
+
             HideOtherMainsExceptThis(anchorPane_Room);
             textField_RRoomName.setEditable(false);
             textField_RRoomName.setText(roomName);
@@ -369,6 +360,12 @@ public class Controller {
     }
 
     public void StartClient(InetAddress inetAddress){
+        try {
+            client.StopFindingServers();
+            client.StopReceivingInet();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         client.StartMainClient(inetAddress);
     }
 

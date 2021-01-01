@@ -99,6 +99,8 @@ public class Client {
                         }
                         else if(packetPlayer.isChecking()){
                             player.setID(packetPlayer.getID());
+                            controller.AddPlayerToList(playerMe,true);
+
                         }
                     }
                     //YOU HAVE JOINED THE ROOM AND GETTING THE PLAYER LIST

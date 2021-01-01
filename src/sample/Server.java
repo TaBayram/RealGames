@@ -102,6 +102,35 @@ public class Server {
 
                         if(packetPlayer.isJoining()){
 
+                            //GIVE THE JOINING PLAYER UNIQUE ID
+                            int ID;
+                            while(true) {
+                                ID = 100000 + random.nextInt(99999);
+                                boolean isUnique = true;
+                                for (ConnectedSocketsThread connectedSocketsThread : clients) {
+                                    if (ID == connectedSocketsThread.player.getID()) {
+                                        isUnique = false;
+                                        break;
+                                    }
+                                }
+                                if(isUnique) break;
+                            }
+                            packetPlayer.setID(ID);
+
+                            try{
+                                packetPlayer.setJoining(false);
+                                packetPlayer.setChecking(true);
+                                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                                objectOutputStream.writeObject(packetPlayer);
+                                objectOutputStream.flush();
+                                packetPlayer.setChecking(false);
+                                packetPlayer.setJoining(true);
+                            }
+                            catch (Exception exception){
+                                System.out.println("###Error in ID: " + exception);
+                            }
+
+
                             var clientName = packetPlayer.getName();
                             System.out.println("### Player has joined! " +clientName);
 
@@ -183,31 +212,6 @@ public class Server {
             this.player = player;
             this.socket = socket;
 
-            int ID;
-            while(true) {
-                ID = 100000 + random.nextInt(99999);
-                boolean isUnique = true;
-                for (ConnectedSocketsThread connectedSocketsThread : clients) {
-                    if (ID == connectedSocketsThread.player.getID()) {
-                        isUnique = false;
-                        break;
-                    }
-                }
-                if(isUnique) break;
-            }
-
-            player.setID(ID);
-
-            try{
-                player.setChecking(true);
-                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                objectOutputStream.writeObject(player);
-                objectOutputStream.flush();
-                player.setChecking(false);
-            }
-            catch (Exception exception){
-
-            }
 
         }
 
