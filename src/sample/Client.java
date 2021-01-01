@@ -124,6 +124,9 @@ public class Client {
                         else if(packetGameCommand.isExiting()){
                             controller.ShowPlayBecauseYouGotKicked();
                         }
+                        else if(packetGameCommand.isStarting()){
+                            controller.next();
+                        }
                     }
 
                     //MATH

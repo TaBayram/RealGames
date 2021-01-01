@@ -266,7 +266,8 @@ public class Controller {
             String gmAnswerText = textField_GMAnswer.getText();
             double answer = Double.parseDouble(gmAnswerText);
 
-            if(answer == mathQuestion.getAnswer()){
+            if(answer == mathQuestion.getAnswer() && !hasSent){
+                hasSent = true;
                 label_Question.setText("CORRECT");
                 long seconds = (new Date(System.currentTimeMillis()).getTime()-starTime.getTime())/1000;
 
@@ -292,6 +293,7 @@ public class Controller {
         });
     }
 
+    boolean hasSent = false;
     int countDown = 3;
     Date starTime = new Date(System.currentTimeMillis());
     DataPackages.MathQuestion mathQuestion = new DataPackages().new MathQuestion();
@@ -368,18 +370,25 @@ public class Controller {
 
     public void buttonNextQuestion(ActionEvent actionEvent) {
             client.mainClientThread.StartGame();
+
+
+    }
+
+    public void next(){
+        Platform.runLater(() -> {
             countDown = 3;
             TimerTask task = new TimerTask() {
-                @Override public void run() {
+                @Override
+                public void run() {
                     Platform.runLater(() -> {
-                        if(countDown <= 0){
+                        if (countDown <= 0) {
+                            hasSent = false;
                             starTime = new Date(System.currentTimeMillis());
                             label_Question.setText(mathQuestion.getQuestion());
                             timer_GameClock.cancel();
-                        }
-                        else{
-                            label_Question.setText(countDown+"...");
-                            countDown --;
+                        } else {
+                            label_Question.setText(countDown + "...");
+                            countDown--;
                         }
 
                     });
@@ -387,8 +396,8 @@ public class Controller {
                 }
             };
             timer_GameClock = new Timer();
-            timer_GameClock.schedule(task,0,1500);
-
+            timer_GameClock.schedule(task, 0, 1500);
+        });
     }
 
 
