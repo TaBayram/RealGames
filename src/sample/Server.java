@@ -143,8 +143,10 @@ public class Server {
 
         public void SendLeavingPlayerPacket(ConnectedSocketsThread connectedSocketsThread){
             for (ConnectedSocketsThread connectedSocketsThread2: clients) {
+                System.out.println(""+connectedSocketsThread.player.getName());
                 if(connectedSocketsThread != connectedSocketsThread2){
                     try {
+                        System.out.println("Sending leave information to other players");
                         objectOutputStream = new ObjectOutputStream(connectedSocketsThread.socket.getOutputStream());
                         objectOutputStream.writeObject(connectedSocketsThread.player);
                         objectOutputStream.flush();
@@ -185,7 +187,6 @@ public class Server {
                         var packetPlayer = (DataPackages.Player) (packet);
 
                         if(packetPlayer.isLeaving()){
-                            System.out.println("hey");
                             Disconnect();
                         }
 
@@ -210,7 +211,7 @@ public class Server {
 
         public void Disconnect(){
             try {
-
+                if(socket.isClosed()) return;
 
                 player.setLeaving(true);
                 mainServerThread.SendLeavingPlayerPacket(this);
@@ -218,8 +219,6 @@ public class Server {
                 var objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
                 objectOutputStream.writeObject(player);
                 objectOutputStream.flush();
-
-
 
 
                 if (objectInputStream != null)

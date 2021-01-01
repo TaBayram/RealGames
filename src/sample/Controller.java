@@ -84,7 +84,7 @@ public class Controller {
             StartServer();
             isServerOwner = true;
             HideOtherMainsExceptThis(anchorPane_Room);
-            AddPlayerToList(Client.playerName);
+            AddPlayerToList(Client.playerName,false);
 
         }
 
@@ -129,11 +129,11 @@ public class Controller {
         HideOtherMainsExceptThis(anchorPane_GameMath);
     }
 
-    public void AddPlayerToList(String name) {
+    public void AddPlayerToList(String name,boolean isAfter) {
         Platform.runLater(() -> {
             RoomPlayerBox roomPlayerBox = new RoomPlayerBox(vBox_RoomPlayerList, name);
             roomPlayerBoxes.add(roomPlayerBox);
-            listView_RLog.getItems().add(name +" has joined!");
+            if(isAfter) listView_RLog.getItems().add(name +" has joined!");
 
         });
     }
@@ -220,7 +220,7 @@ public class Controller {
                 Client.playerName = result.get();
             }
             StartClient(inetAddress);
-            AddPlayerToList(client.playerName);
+            AddPlayerToList(client.playerName,true);
             try{
                 client.StopFindingServers();
                 client.StopReceivingInet();

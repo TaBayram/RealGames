@@ -76,7 +76,7 @@ public class Client {
                         //A PLAYER HAS JOINED THE ROOM
                         if(packetPlayer.isJoining()){
                             System.out.println(">>> Player has joined! " +packetPlayer.getName());
-                            controller.AddPlayerToList(packetPlayer.getName());
+                            controller.AddPlayerToList(packetPlayer.getName(),true);
 
                         }
                         else if(packetPlayer.isLeaving()){
@@ -100,7 +100,7 @@ public class Client {
                     else if(packet.getClass() == DataPackages.PlayerList.class){
                         var packetPlayer = (DataPackages.PlayerList)(packet);
                         for (String player: packetPlayer.getNames()) {
-                            controller.AddPlayerToList(player);
+                            controller.AddPlayerToList(player,false);
                         }
                         this.playerList = packetPlayer;
                     }
