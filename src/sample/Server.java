@@ -145,9 +145,9 @@ public class Server {
             for (ConnectedSocketsThread connectedSocketsThread: clients) {
                 if(LeavingSocketThread != connectedSocketsThread){
                     try {
-                        System.out.println("Sending leave information to other players");
+                        System.out.println("Leaver " +LeavingSocketThread.player.getName() +" Sending to " + connectedSocketsThread.player.getName());
                         objectOutputStream = new ObjectOutputStream(connectedSocketsThread.socket.getOutputStream());
-                        objectOutputStream.writeObject(connectedSocketsThread.player);
+                        objectOutputStream.writeObject(LeavingSocketThread.player);
                         objectOutputStream.flush();
                     } catch (IOException e) {
                         e.printStackTrace();

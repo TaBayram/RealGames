@@ -141,7 +141,7 @@ public class Controller {
     public void RemovePlayerFromList(String name) {
         Platform.runLater(() -> {
             for(RoomPlayerBox roomPlayerBox: roomPlayerBoxes){
-                if(roomPlayerBox.labelName.getText() == name){
+                if(roomPlayerBox.labelName.getText().trim().equals(name.trim())){
                     roomPlayerBox.Remove();
                     listView_RLog.getItems().add(name +" has left!");
                     break;

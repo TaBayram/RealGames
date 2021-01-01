@@ -81,7 +81,7 @@ public class Client {
                         }
                         else if(packetPlayer.isLeaving()){
 
-                            if(packetPlayer == player){
+                            if(packetPlayer.getName().trim().equals(player.getName().trim())){
                                 System.out.println(">>> Getting Kicked");
                                 controller.ShowPlayBecauseYouGotKicked();
                                 socket.close();
@@ -89,7 +89,7 @@ public class Client {
                             }
                             else{
                                 controller.RemovePlayerFromList(packetPlayer.getName());
-                                System.out.println(">>> Player has left!");
+                                System.out.println(">>> Player has left!" + packetPlayer.getName());
 
                             }
 
