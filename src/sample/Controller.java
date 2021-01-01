@@ -307,7 +307,7 @@ public class Controller {
             else{
                 button_GMSendAnswer1.setDisable(true);
             }
-            buttonNextQuestion(null);
+           if(isServerOwner) buttonNextQuestion(null);
             for (RoomPlayerBox player : roomPlayerBoxes) {
                 Label label = new Label(player.labelName.getText() + ":" + "0");
                 vBox_GMPlayer.getChildren().add(label);
