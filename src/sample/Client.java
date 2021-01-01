@@ -142,17 +142,6 @@ public class Client {
                 objectOutputStream.writeObject(player);
                 objectOutputStream.flush();
 
-                try {
-                    if (mainClientThread.objectInputStream != null)
-                        mainClientThread.objectInputStream.close();
-                    if (mainClientThread.objectOutputStream != null)
-                        mainClientThread.objectOutputStream.close();
-                    mainClientThread.socket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-
             }
             catch (Exception exception){
                 System.out.println(">>>Error Leaving: "+exception.getMessage());

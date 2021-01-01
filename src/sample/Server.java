@@ -185,6 +185,7 @@ public class Server {
                         var packetPlayer = (DataPackages.Player) (packet);
 
                         if(packetPlayer.isLeaving()){
+                            System.out.println("hey");
                             Disconnect();
                         }
 
@@ -209,12 +210,16 @@ public class Server {
 
         public void Disconnect(){
             try {
+
+
                 player.setLeaving(true);
+                mainServerThread.SendLeavingPlayerPacket(this);
+
                 var objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
                 objectOutputStream.writeObject(player);
                 objectOutputStream.flush();
 
-                mainServerThread.SendLeavingPlayerPacket(this);
+
 
 
                 if (objectInputStream != null)

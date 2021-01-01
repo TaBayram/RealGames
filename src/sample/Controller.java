@@ -155,7 +155,7 @@ public class Controller {
     public void buttonRoomBackClick(ActionEvent actionEvent) {
         if(isServerOwner){
             StopServer();
-            isServerOwner = true;
+            isServerOwner = false;
         }
         else{
             StopClient();
