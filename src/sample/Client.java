@@ -96,11 +96,12 @@ public class Client {
                         else if(packetPlayer.isChecking()){
                             playerMe.setID(packetPlayer.getID());
                             controller.AddPlayerToList(playerMe,true);
+                            controller.players.add(playerMe);
 
                         }
 
-                        else if(packetPlayer.isSendingScore){
-                            controller.ChangeScore(packetPlayer.getName(),packetPlayer.getScore());
+                        else if(packetPlayer.isSendingScore()){
+                            controller.ChangeScore(packetPlayer,packetPlayer.getScore());
 
                         }
 
@@ -110,6 +111,7 @@ public class Client {
                         var packetPlayer = (DataPackages.PlayerList)(packet);
                         for (DataPackages.Player player: packetPlayer.getPlayers()) {
                             controller.AddPlayerToList(player,false);
+                            controller.players.add(player);
                         }
                         this.playerList = packetPlayer;
                     }
@@ -124,6 +126,9 @@ public class Client {
                         else if(packetGameCommand.isExiting()){
                             controller.ShowPlayBecauseYouGotKicked();
                         }
+                        else if(packetGameCommand.isHasEveryoneSentAnswer()){
+                            controller.EndCurrentLevel();
+                        }
 
                     }
 
@@ -133,7 +138,7 @@ public class Client {
 
                         if(packetMathQuestion.isSendingQuestion()){
                             controller.mathQuestion = packetMathQuestion;
-                            controller.next();
+                            controller.PrepareForNextLevel();
                         }
 
                     }

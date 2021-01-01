@@ -44,6 +44,7 @@ public class Controller {
     public Label label_GMScore;
     public Button button_GMSendAnswer1;
     public VBox vBox_GMPlayer;
+    public Label label_Timer;
 
 
     public void initialize() {
@@ -97,7 +98,6 @@ public class Controller {
     }
 
     Timer timer_FindServer;
-    Timer timer_GameClock;
 
     public void buttonSearchRoomClick(ActionEvent actionEvent) {
         HideOtherMainsExceptThis(anchorPane_FindRooms);
@@ -259,6 +259,20 @@ public class Controller {
 
 
     //GAME MATH SCREEN
+    Vector<DataPackages.Player> players = new Vector<>();
+    Vector<GamePlayerScoreBox> gamePlayerScoreBoxes = new Vector<>();
+
+
+
+    Timer timer_GameCountdown;
+    Timer timer_GameLevelTime;
+
+    boolean gameModeHasSent = false;
+    boolean gameModeCanAnswer = false;
+    int questionCountdown = 8;
+    double gameLevelTime = 10;
+    Date starTime = new Date(System.currentTimeMillis());
+    DataPackages.MathQuestion mathQuestion = new DataPackages().new MathQuestion();
 
     public void buttonSendAnswer(ActionEvent actionEvent) {
 
@@ -266,16 +280,19 @@ public class Controller {
             String gmAnswerText = textField_GMAnswer.getText();
             double answer = Double.parseDouble(gmAnswerText);
 
-            if(answer == mathQuestion.getAnswer() && !hasSent){
-                hasSent = true;
+            if(answer == mathQuestion.getAnswer() && !gameModeHasSent && gameModeCanAnswer){
+                gameModeHasSent = true;
                 label_Question.setText("CORRECT");
                 long seconds = (new Date(System.currentTimeMillis()).getTime()-starTime.getTime())/1000;
+                int score =  (int)Math.round(((10.0/(10.0 + seconds) )*mathQuestion.getPoint()));
 
-                label_GMScore.setText("Completed in " +seconds + " seconds \n    Score: " + Math.round(((10.0/(10.0 + seconds) )*mathQuestion.getPoint())));
+                label_GMScore.setText("Completed in " +seconds + " seconds \n    Point: " + score);
 
 
-                Client.playerMe.setScore((int) (Client.playerMe.getScore() + Math.round(((10.0/(10.0 + seconds) )*mathQuestion.getPoint()))));
-                mathQuestion.setPoint(Client.playerMe.getScore());
+                Client.playerMe.setScore(Client.playerMe.getScore() + score);
+
+                mathQuestion.setPoint(score);
+
                 SendAnswer(mathQuestion);
             }
         }
@@ -286,18 +303,6 @@ public class Controller {
 
     }
 
-
-    public void ShowPlayBecauseYouGotKicked() {
-        Platform.runLater(() -> {
-           HideOtherMainsExceptThis(anchorPane_Play);
-        });
-    }
-
-    boolean hasSent = false;
-    int countDown = 3;
-    Date starTime = new Date(System.currentTimeMillis());
-    DataPackages.MathQuestion mathQuestion = new DataPackages().new MathQuestion();
-
     public void ShowGameScreenAndStartTheClock(){
         Platform.runLater(() -> {
             HideOtherMainsExceptThis(anchorPane_GameMath);
@@ -307,10 +312,10 @@ public class Controller {
             else{
                 button_GMSendAnswer1.setDisable(true);
             }
-           if(isServerOwner) buttonNextQuestion(null);
-            for (RoomPlayerBox player : roomPlayerBoxes) {
-                Label label = new Label(player.labelName.getText() + ":" + "0");
-                vBox_GMPlayer.getChildren().add(label);
+           if(isServerOwner) client.mainClientThread.StartGame();
+            for (DataPackages.Player player : players) {
+                GamePlayerScoreBox gamePlayerScoreBox = new GamePlayerScoreBox(vBox_GMPlayer, player);
+                gamePlayerScoreBoxes.add(gamePlayerScoreBox);
             }
         });
 
@@ -318,16 +323,104 @@ public class Controller {
 
     }
 
-    public void ChangeScore(String name, int score){
+    public void ChangeScore(DataPackages.Player player, int score){
         Platform.runLater(() -> {
-        for (Node node : vBox_GMPlayer.getChildren()) {
-            var label = (Label) node;
-            if(label.getText().startsWith(name.trim())){
-                label.setText(name + ":" + score);
+        for (GamePlayerScoreBox gamePlayerScoreBox : gamePlayerScoreBoxes) {
+            if(gamePlayerScoreBox.player.getID() == player.getID()){
+                gamePlayerScoreBox.SetScore(score);
             }
         }
         });
     }
+
+
+    public void PrepareForNextLevel(){
+        Platform.runLater(() -> {
+
+            questionCountdown = 8;
+            gameLevelTime = 10 + mathQuestion.getLevel()*2;
+
+            TimerTask questionTask = new TimerTask() {
+                @Override
+                public void run() {
+                    Platform.runLater(() -> {
+                        if (questionCountdown <= 0) {
+
+                            TimerTask gameLevelTimeTimerTask = new TimerTask() {
+                                @Override
+                                public void run() {
+                                    Platform.runLater(() -> {
+                                        if (gameLevelTime <= 0) {
+                                            EndCurrentLevel();
+                                        } else {
+                                            int miliseconds = (int)Math.round((gameLevelTime%1.00) * 10);
+                                            label_Timer.setText((int)Math.round(gameLevelTime-.500) + ":" + miliseconds);
+                                            gameLevelTime -= 0.500;
+                                        }
+
+                                    });
+
+                                }
+                            };
+
+
+                            timer_GameLevelTime = new Timer();
+                            timer_GameLevelTime.schedule(gameLevelTimeTimerTask, 0, 500);
+
+                            gameModeHasSent = false;
+                            starTime = new Date(System.currentTimeMillis());
+                            label_Question.setText(mathQuestion.getQuestion());
+
+                            timer_GameCountdown.cancel();
+                        } else if (questionCountdown <= 5) {
+                            if(questionCountdown == 2){
+                                textField_GMAnswer.setEditable(true);
+                                textField_GMAnswer.setText("");
+                                gameModeCanAnswer = true;
+                            }
+                            label_Question.setText("Level " + mathQuestion.getLevel() + " in "+questionCountdown + "...");
+
+                        }
+                        else{
+
+                        }
+                        questionCountdown--;
+
+                    });
+
+                }
+            };
+
+            timer_GameCountdown = new Timer();
+            timer_GameCountdown.schedule(questionTask, 0, 1000);
+
+
+        });
+    }
+
+
+
+    public void EndCurrentLevel(){
+        Platform.runLater(()->{
+            gameModeCanAnswer = false;
+
+            label_Question.setText("Answer: "+ mathQuestion.getAnswer() );
+            textField_GMAnswer.setEditable(false);
+            label_Timer.setText("00:00");
+
+
+            client.mainClientThread.StartGame();
+
+
+            timer_GameLevelTime.cancel();
+
+
+
+        });
+
+    }
+
+
 
 
 
@@ -368,37 +461,77 @@ public class Controller {
 
     }
 
-    public void buttonNextQuestion(ActionEvent actionEvent) {
-            client.mainClientThread.StartGame();
-
-
-    }
-
-    public void next(){
+    public void ShowPlayBecauseYouGotKicked() {
         Platform.runLater(() -> {
-            countDown = 3;
-            TimerTask task = new TimerTask() {
-                @Override
-                public void run() {
-                    Platform.runLater(() -> {
-                        if (countDown <= 0) {
-                            hasSent = false;
-                            starTime = new Date(System.currentTimeMillis());
-                            label_Question.setText(mathQuestion.getQuestion());
-                            timer_GameClock.cancel();
-                        } else {
-                            label_Question.setText(countDown + "...");
-                            countDown--;
-                        }
-
-                    });
-
-                }
-            };
-            timer_GameClock = new Timer();
-            timer_GameClock.schedule(task, 0, 1500);
+            HideOtherMainsExceptThis(anchorPane_Play);
         });
     }
+
+
+    private class GamePlayerScoreBox{
+
+
+        DataPackages.Player player;
+        int previousPoint;
+
+        Pane paneMain = new Pane();
+        Label labelName = new Label();
+        Label labelTotalScore = new Label();
+        Label labelPreviousLevelPoint = new Label();
+        VBox parent = new VBox();
+
+        GamePlayerScoreBox(VBox parent, DataPackages.Player player){
+            this.player = player;
+            this.parent = parent;
+
+            var width = parent.getWidth();
+
+            paneMain.setPrefSize(width/.90,60);
+            paneMain.getStyleClass().add("gameplayerpane");
+
+            labelName = new Label(player.getName());
+            labelName.getStyleClass().add("gameplayertext");
+
+            labelName.setLayoutX(5);
+            labelName.setLayoutY(5);
+
+            labelTotalScore = new Label("Total "+player.getScore());
+            labelTotalScore.getStyleClass().add("gameplayertext");
+
+            labelTotalScore.setLayoutX(5);
+            labelTotalScore.setLayoutY(35);
+
+            labelPreviousLevelPoint = new Label("Previous Point "+ player.getScore() );
+            labelPreviousLevelPoint.getStyleClass().add("gameplayertext");
+
+            labelPreviousLevelPoint.setLayoutX(40);
+            labelPreviousLevelPoint.setLayoutY(20);
+
+            previousPoint = player.getScore() +0;
+
+            paneMain.getChildren().addAll(labelName,labelPreviousLevelPoint,labelTotalScore);
+
+            parent.getChildren().add(paneMain);
+        }
+
+        public void SetScore(int score){
+            previousPoint = score - previousPoint;
+            labelTotalScore.setText("Total "+player.getScore());
+            labelPreviousLevelPoint.setText("Previous Point "+ previousPoint );
+            previousPoint = player.getScore() +0;
+
+        }
+
+        public void Remove(){
+            parent.getChildren().remove(paneMain);
+        }
+
+
+    }
+
+
+
+
 
 
     private class RoomPlayerBox{

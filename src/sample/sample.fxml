@@ -66,7 +66,7 @@
       </AnchorPane>
       <AnchorPane fx:id="anchorPane_GameMath" disable="true" layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
          <children>
-            <Label layoutX="155.0" layoutY="28.0" text="Math">
+            <Label layoutX="178.0" layoutY="28.0" text="Math">
                <font>
                   <Font name="Goudy Old Style Bold" size="49.0" />
                </font>
@@ -77,18 +77,18 @@
                </font>
             </Button>
             <TextField fx:id="textField_GMAnswer" layoutX="77.0" layoutY="354.0" onAction="#buttonSendAnswer" prefHeight="57.0" prefWidth="265.0" promptText="Enter Your Answer" />
-            <Label fx:id="label_Question" alignment="TOP_CENTER" layoutX="32.0" layoutY="149.0" maxHeight="170.0" maxWidth="400.0" prefHeight="171.0" prefWidth="401.0" text="3 + 2" wrapText="true">
+            <Label fx:id="label_Question" alignment="TOP_CENTER" layoutX="32.0" layoutY="149.0" maxHeight="170.0" maxWidth="400.0" prefHeight="171.0" prefWidth="401.0" text="Level 1" wrapText="true">
                <font>
                   <Font name="Goudy Old Style Bold" size="40.0" />
                </font>
             </Label>
             <VBox fx:id="vBox_GMPlayer" alignment="CENTER" layoutX="451.0" prefHeight="600.0" prefWidth="135.0" spacing="10.0" />
             <Label fx:id="label_GMScore" layoutX="84.0" layoutY="519.0" maxHeight="90.0" maxWidth="250.0" prefHeight="71.0" prefWidth="250.0" wrapText="true" />
-            <Button fx:id="button_GMSendAnswer1" layoutX="342.0" layoutY="494.0" mnemonicParsing="false" onAction="#buttonNextQuestion" prefHeight="50.0" prefWidth="108.0" styleClass="generalbuttons" text="Next">
+            <Label fx:id="label_Timer" alignment="CENTER" layoutX="200.0" layoutY="100.0" prefHeight="25.0" prefWidth="65.0" text="00:00">
                <font>
-                  <Font size="21.0" />
+                  <Font size="16.0" />
                </font>
-            </Button>
+            </Label>
          </children>
       </AnchorPane>
    </children>

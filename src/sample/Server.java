@@ -244,10 +244,29 @@ public class Server {
 
                         if(packetMathQuestion.isSendingAnswer()){
                             System.out.println("##>Answer from: " +player.getName() + " - "+ packetMathQuestion.getAnswer());
-                            player.setScore((int) Math.round(packetMathQuestion.getPoint()));
-                            player.isSendingScore = true;
+
+                            player.setScore(player.getScore() + (int)Math.round(packetMathQuestion.getPoint()));
+
+                            player.setSendingScore(true);
                             ObjectFlushAll(player);
-                            player.isSendingScore = false;
+                            player.setSendingScore(false);
+                            player.setHasSentAnswer(true);
+
+
+                            boolean hasAllSent = true;
+                            for (ConnectedSocketsThread socketsThread:clients) {
+                                if(!socketsThread.player.isHasSentAnswer()){
+                                    hasAllSent = false;
+                                }
+                            }
+
+                            if(hasAllSent){
+                                DataPackages.GameCommand gameCommand = new DataPackages().new GameCommand();
+                                gameCommand.setHasEveryoneSentAnswer(true);
+                                ObjectFlushAll(gameCommand);
+                            }
+
+
                         }
 
                     }
@@ -266,7 +285,6 @@ public class Server {
                             ObjectFlushAll(packetGameCommand);
                         }
                         else if(packetGameCommand.isStarting()){
-                            System.out.println("Hey");
                             nextQuestion();
                         }
                     }
@@ -312,6 +330,7 @@ public class Server {
             mathQuestion.setAnswer(concurrentMath.answer);
             mathQuestion.setQuestion(concurrentMath.question);
             mathQuestion.setPoint(concurrentMath.levelScore);
+            mathQuestion.setLevel(concurrentMath.level);
             mathQuestion.setSendingQuestion(true);
 
             ObjectFlushAll(mathQuestion);

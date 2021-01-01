@@ -14,7 +14,8 @@ public class DataPackages implements java.io.Serializable{
         private boolean isLeaving = false;
         private boolean isChecking = false;
 
-        public boolean isSendingScore = false;
+        private boolean isSendingScore = false;
+        private boolean hasSentAnswer = false;
 
 
         Player(String name){
@@ -73,6 +74,22 @@ public class DataPackages implements java.io.Serializable{
         public void setScore(int score) {
             this.score = score;
         }
+
+        public boolean isSendingScore() {
+            return isSendingScore;
+        }
+
+        public void setSendingScore(boolean sendingScore) {
+            isSendingScore = sendingScore;
+        }
+
+        public boolean isHasSentAnswer() {
+            return hasSentAnswer;
+        }
+
+        public void setHasSentAnswer(boolean hasSentAnswer) {
+            this.hasSentAnswer = hasSentAnswer;
+        }
     }
 
     public class PlayerList implements java.io.Serializable{
@@ -127,12 +144,21 @@ public class DataPackages implements java.io.Serializable{
             isEnding = ending;
         }
 
+        public boolean isHasEveryoneSentAnswer() {
+            return hasEveryoneSentAnswer;
+        }
+
+        public void setHasEveryoneSentAnswer(boolean hasEveryoneSentAnswer) {
+            this.hasEveryoneSentAnswer = hasEveryoneSentAnswer;
+        }
+
         private boolean isEntering = false;
         private boolean isExiting = false;
 
         private boolean isStarting = false;
         private boolean isEnding = false;
 
+        boolean hasEveryoneSentAnswer = false;
         boolean NextLevel = false;
 
 
@@ -143,7 +169,7 @@ public class DataPackages implements java.io.Serializable{
         private String question;
         private double answer;
         private double point;
-
+        private int level;
 
         private boolean isSendingQuestion = false;
         private boolean isSendingAnswer = false;
@@ -193,6 +219,13 @@ public class DataPackages implements java.io.Serializable{
             isSendingAnswer = sendingAnswer;
         }
 
+        public int getLevel() {
+            return level;
+        }
+
+        public void setLevel(int level) {
+            this.level = level;
+        }
     }
 
 
