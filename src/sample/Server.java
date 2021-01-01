@@ -141,10 +141,9 @@ public class Server {
             }
         }
 
-        public void SendLeavingPlayerPacket(ConnectedSocketsThread connectedSocketsThread){
-            for (ConnectedSocketsThread connectedSocketsThread2: clients) {
-                System.out.println(""+connectedSocketsThread.player.getName());
-                if(connectedSocketsThread != connectedSocketsThread2){
+        public void SendLeavingPlayerPacket(ConnectedSocketsThread LeavingSocketThread){
+            for (ConnectedSocketsThread connectedSocketsThread: clients) {
+                if(LeavingSocketThread != connectedSocketsThread){
                     try {
                         System.out.println("Sending leave information to other players");
                         objectOutputStream = new ObjectOutputStream(connectedSocketsThread.socket.getOutputStream());
