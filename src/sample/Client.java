@@ -33,15 +33,8 @@ public class Client {
 
     public void StopMainClient() {
         mainClientThreadCanRun = false;
-        try {
-            if (mainClientThread.objectInputStream != null)
-                mainClientThread.objectInputStream.close();
-            if (mainClientThread.objectOutputStream != null)
-                mainClientThread.objectOutputStream.close();
-            mainClientThread.socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        mainClientThread.LeaveRoom();
+
 
     }
 
@@ -138,6 +131,32 @@ public class Client {
                 System.out.println(">>>Error Answer: "+exception.getMessage());
             }
 
+
+        }
+
+        public void LeaveRoom(){
+            try{
+
+                player.setLeaving(true);
+                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                objectOutputStream.writeObject(player);
+                objectOutputStream.flush();
+
+                try {
+                    if (mainClientThread.objectInputStream != null)
+                        mainClientThread.objectInputStream.close();
+                    if (mainClientThread.objectOutputStream != null)
+                        mainClientThread.objectOutputStream.close();
+                    mainClientThread.socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+            catch (Exception exception){
+                System.out.println(">>>Error Leaving: "+exception.getMessage());
+            }
 
         }
 

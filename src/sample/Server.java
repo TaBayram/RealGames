@@ -184,6 +184,10 @@ public class Server {
                     if(packet.getClass() == DataPackages.Player.class) {
                         var packetPlayer = (DataPackages.Player) (packet);
 
+                        if(packetPlayer.isLeaving()){
+                            Disconnect();
+                        }
+
 
                     }
                     else if(packet.getClass() == DataPackages.MathQuestion.class){
