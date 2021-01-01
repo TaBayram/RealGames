@@ -1,13 +1,11 @@
 package sample;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,6 +43,8 @@ public class Server {
     }
 
     public void StopMainServer() {
+        mainServerThreadCanRun = false;
+
         try{
             for(ConnectedSocketsThread socketsThread: clients){
                 socketsThread.Disconnect();
@@ -54,7 +54,6 @@ public class Server {
 
         }
 
-        mainServerThreadCanRun = false;
         try {
             if (mainServerThread.objectInputStream != null)
                 mainServerThread.objectInputStream.close();
@@ -89,6 +88,8 @@ public class Server {
                     }
                     catch(SocketException socketException){
                         System.out.println("###Server Closed");
+                        DiscoveryThread.datagramSocket.close();
+                        break;
                     }
 
 
@@ -113,7 +114,7 @@ public class Server {
                                 objectOutputStream.flush();
 
 
-                                playerList.getNames().add(connectedSocketsThread.player.getName());
+                                playerList.getPlayers().add(connectedSocketsThread.player);
 
                             }
 
@@ -128,6 +129,8 @@ public class Server {
                             connectedSocketsThread.start();
 
                             clients.add(connectedSocketsThread);
+
+
 
                         }
                     }
@@ -158,26 +161,59 @@ public class Server {
 
             }
 
+            clients.remove(LeavingSocketThread);
+
         }
     }
 
 
 
-
+    Random random = new Random();
 
     public class ConnectedSocketsThread extends Thread{
+        private boolean canRun = true;
+
         public DataPackages.Player player = new DataPackages().new Player();
         public Socket socket;
+
         ObjectInputStream objectInputStream;
+        ObjectOutputStream objectOutputStream;
 
         ConnectedSocketsThread(DataPackages.Player player, Socket socket){
             this.player = player;
             this.socket = socket;
+
+            int ID;
+            while(true) {
+                ID = 100000 + random.nextInt(99999);
+                boolean isUnique = true;
+                for (ConnectedSocketsThread connectedSocketsThread : clients) {
+                    if (ID == connectedSocketsThread.player.getID()) {
+                        isUnique = false;
+                        break;
+                    }
+                }
+                if(isUnique) break;
+            }
+
+            player.setID(ID);
+
+            try{
+                player.setChecking(true);
+                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                objectOutputStream.writeObject(player);
+                objectOutputStream.flush();
+                player.setChecking(false);
+            }
+            catch (Exception exception){
+
+            }
+
         }
 
         @Override
         public void run() {
-            while(socket.isConnected()) {
+            while(socket.isConnected() && canRun) {
                 try{
                     objectInputStream = new ObjectInputStream((socket.getInputStream()));
                     var packet = objectInputStream.readObject();
@@ -211,6 +247,7 @@ public class Server {
         public void Disconnect(){
             try {
                 if(socket.isClosed()) return;
+                canRun = false;
 
                 player.setLeaving(true);
                 mainServerThread.SendLeavingPlayerPacket(this);
@@ -234,15 +271,14 @@ public class Server {
 
 
     public static class DiscoveryThread implements Runnable {
-
-        DatagramSocket socket;
+        public static DatagramSocket datagramSocket;
 
         @Override
         public void run() {
             try {
                 //Keep a socket open to listen to all the UDP traffic that is destined for this port
-                socket = new DatagramSocket(6666, InetAddress.getByName("0.0.0.0"));
-                socket.setBroadcast(true);
+                datagramSocket = new DatagramSocket(6666, InetAddress.getByName("0.0.0.0"));
+                datagramSocket.setBroadcast(true);
 
                 while (true) {
                     System.out.println(getClass().getName() + "###Ready to receive broadcast packets!");
@@ -250,7 +286,13 @@ public class Server {
                     //Receive a packet
                     byte[] receiveBuf = new byte[15000];
                     DatagramPacket packet = new DatagramPacket(receiveBuf, receiveBuf.length);
-                    socket.receive(packet);
+                    try {
+                        datagramSocket.receive(packet);
+                    }
+                    catch(Exception exception){
+                        break;
+                    }
+
 
                     //Packet received
                     System.out.println(getClass().getName() + "###Discovery packet received from: " + packet.getAddress().getHostAddress());
@@ -263,7 +305,7 @@ public class Server {
 
                         //Send a response
                         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, packet.getAddress(), packet.getPort());
-                        socket.send(sendPacket);
+                        datagramSocket.send(sendPacket);
 
                         System.out.println(getClass().getName() + "###Sent packet to: " + sendPacket.getAddress().getHostAddress());
                     }

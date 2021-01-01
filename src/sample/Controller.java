@@ -76,15 +76,15 @@ public class Controller {
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()){
             if(result.get().trim() == ""){
-                Client.playerName = "Generic";
+                Client.playerMe.setName("Generic");
             }
             else{
-                Client.playerName = result.get();
+                Client.playerMe.setName(result.get());
             }
             StartServer();
             isServerOwner = true;
             HideOtherMainsExceptThis(anchorPane_Room);
-            AddPlayerToList(Client.playerName,false);
+            AddPlayerToList(Client.playerMe,false);
 
         }
 
@@ -129,21 +129,21 @@ public class Controller {
         HideOtherMainsExceptThis(anchorPane_GameMath);
     }
 
-    public void AddPlayerToList(String name,boolean isAfter) {
+    public void AddPlayerToList(DataPackages.Player player,boolean isAfter) {
         Platform.runLater(() -> {
-            RoomPlayerBox roomPlayerBox = new RoomPlayerBox(vBox_RoomPlayerList, name);
+            RoomPlayerBox roomPlayerBox = new RoomPlayerBox(vBox_RoomPlayerList, player);
             roomPlayerBoxes.add(roomPlayerBox);
-            if(isAfter) listView_RLog.getItems().add(name +" has joined!");
+            if(isAfter) listView_RLog.getItems().add(player.getName() +" has joined!");
 
         });
     }
 
-    public void RemovePlayerFromList(String name) {
+    public void RemovePlayerFromList(DataPackages.Player player) {
         Platform.runLater(() -> {
             for(RoomPlayerBox roomPlayerBox: roomPlayerBoxes){
-                if(roomPlayerBox.labelName.getText().trim().equals(name.trim())){
+                if(roomPlayerBox.player.getID() == player.getID()){
                     roomPlayerBox.Remove();
-                    listView_RLog.getItems().add(name +" has left!");
+                    listView_RLog.getItems().add(player.getName() +" has left!");
                     break;
                 }
             }
@@ -213,14 +213,19 @@ public class Controller {
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()){
             if(result.get().trim() == ""){
-                Client.playerName = "Generic";
-
+                Client.playerMe.setName("Generic");
             }
             else{
-                Client.playerName = result.get();
+                Client.playerMe.setName(result.get());
+            }
+            try {
+                client.StopFindingServers();
+                client.StopReceivingInet();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
             StartClient(inetAddress);
-            AddPlayerToList(client.playerName,true);
+            AddPlayerToList(client.playerMe,true);
             try{
                 client.StopFindingServers();
                 client.StopReceivingInet();
@@ -321,18 +326,23 @@ public class Controller {
 
 
     private class RoomPlayerBox{
+
+
+        DataPackages.Player player;
         Pane paneMain = new Pane();
         Label labelName = new Label();
         VBox parent = new VBox();
 
-        RoomPlayerBox(VBox parent,String name){
-            var width = parent.getWidth();
+        RoomPlayerBox(VBox parent, DataPackages.Player player){
+            this.player = player;
             this.parent = parent;
+
+            var width = parent.getWidth();
 
             paneMain.setPrefSize(width/.90,60);
             paneMain.getStyleClass().add("serverpane");
 
-            labelName = new Label(name);
+            labelName = new Label(player.getName());
             labelName.getStyleClass().add("minortext");
 
             labelName.setLayoutX(5);

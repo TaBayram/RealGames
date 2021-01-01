@@ -56,19 +56,25 @@ public class DataPackages implements java.io.Serializable{
         }
 
 
+        public int getID() {
+            return ID;
+        }
 
+        public void setID(int ID) {
+            this.ID = ID;
+        }
     }
 
     public class PlayerList implements java.io.Serializable{
-        public List<String> getNames() {
-            return names;
+        List<Player> players = new ArrayList<>();
+
+        public List<Player> getPlayers() {
+            return players;
         }
 
-        public void setNames(List<String> names) {
-            this.names = names;
+        public void setPlayers(List<Player> players) {
+            this.players = players;
         }
-
-        List<String> names = new ArrayList<>();
 
 
     }

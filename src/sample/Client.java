@@ -7,16 +7,21 @@ import java.util.Enumeration;
 public class Client {
 
     static Controller controller;
+
+    MainClient mainClientThread = new MainClient(null);
+    private boolean mainClientThreadCanRun = false;
+
+    public static String serverName = "";
+
+    public static DataPackages.Player playerMe = new DataPackages().new Player();
+
+
+
     Client(Controller controller){
         this.controller = controller;
 
     }
 
-    public static String serverName = "";
-    public static String playerName = "";
-
-    MainClient mainClientThread = new MainClient(null);
-    private boolean mainClientThreadCanRun = false;
 
     public void StartMainClient(InetAddress inetAddress){
         mainClientThreadCanRun = true;
@@ -44,7 +49,7 @@ public class Client {
         public Socket socket;
         public ObjectOutputStream objectOutputStream;
         public ObjectInputStream objectInputStream;
-        public DataPackages.Player player= new DataPackages().new Player();
+        public DataPackages.Player player= playerMe;
         public DataPackages.PlayerList playerList= new DataPackages().new PlayerList();
 
         MainClient(InetAddress inetAddress){
@@ -58,7 +63,6 @@ public class Client {
                 socket = new Socket(inetAddress, 6666);
 
                 //SEND YOURSELF AS JOINING PLAYER IN THE ROOM
-                player = new DataPackages().new Player(playerName);
                 player.setJoining(true);
                 objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
                 objectOutputStream.writeObject(player);
@@ -76,7 +80,7 @@ public class Client {
                         //A PLAYER HAS JOINED THE ROOM
                         if(packetPlayer.isJoining()){
                             System.out.println(">>> Player has joined! " +packetPlayer.getName());
-                            controller.AddPlayerToList(packetPlayer.getName(),true);
+                            controller.AddPlayerToList(packetPlayer,true);
 
                         }
                         else if(packetPlayer.isLeaving()){
@@ -88,18 +92,19 @@ public class Client {
                                 break;
                             }
                             else{
-                                controller.RemovePlayerFromList(packetPlayer.getName());
+                                controller.RemovePlayerFromList(packetPlayer);
                                 System.out.println(">>> Player has left!" + packetPlayer.getName());
 
                             }
-
-
+                        }
+                        else if(packetPlayer.isChecking()){
+                            player.setID(packetPlayer.getID());
                         }
                     }
                     //YOU HAVE JOINED THE ROOM AND GETTING THE PLAYER LIST
                     else if(packet.getClass() == DataPackages.PlayerList.class){
                         var packetPlayer = (DataPackages.PlayerList)(packet);
-                        for (String player: packetPlayer.getNames()) {
+                        for (DataPackages.Player player: packetPlayer.getPlayers()) {
                             controller.AddPlayerToList(player,false);
                         }
                         this.playerList = packetPlayer;
