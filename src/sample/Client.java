@@ -78,6 +78,7 @@ public class Client {
                         if(packetPlayer.isJoining()){
                             System.out.println(">>> Player has joined! " +packetPlayer.getName());
                             controller.AddPlayerToList(packetPlayer,true);
+                            controller.players.add(playerMe);
 
                         }
                         else if(packetPlayer.isLeaving()){
@@ -137,10 +138,12 @@ public class Client {
                     else if(packet.getClass() == DataPackages.MathQuestion.class){
                         var packetMathQuestion = (DataPackages.MathQuestion)(packet);
 
+                        //RECEIVING QUESTION AND STARTING THE CLCOK
                         if(packetMathQuestion.isSendingQuestion()){
                             controller.mathQuestion = packetMathQuestion;
                             controller.PrepareForNextLevel();
                         }
+
 
                     }
 

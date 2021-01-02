@@ -159,7 +159,7 @@ public class Controller {
                 JoinARoomButtonClick(e,inetAddress,roomName);
             }});
 
-        button.setLayoutX(pane.getPrefWidth()-button.getPrefHeight()-10);
+        button.setLayoutX(90);
         button.setLayoutY(10);
         labelIpAddress.setLayoutX(10);
         labelIpAddress.setLayoutY(40);
@@ -405,7 +405,7 @@ public class Controller {
             label_Timer.setText("00:00");
 
 
-            client.mainClientThread.StartGame();
+            if(isServerOwner) client.mainClientThread.StartGame();
 
 
             timer_GameLevelTime.cancel();
