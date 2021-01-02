@@ -229,4 +229,12 @@ public class DataPackages implements java.io.Serializable{
     }
 
 
+    public class PinPong implements  java.io.Serializable{
+        boolean Ping = false;
+        boolean Pong = false;
+
+
+    }
+
+
 }

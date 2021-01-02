@@ -36,6 +36,7 @@ public class Client {
     }
 
     public void StopMainClient() {
+        if(mainClientThread == null || !mainClientThread.isAlive()) return;
         mainClientThreadCanRun = false;
         mainClientThread.LeaveRoom();
 
@@ -286,7 +287,7 @@ public class Client {
                     System.out.println(Client.class.getName() + ">>> Done looping over all network interfaces. Now waiting for a reply!");
                     long startTime = System.currentTimeMillis();
                     System.out.println(">>>Outside time" + (System.currentTimeMillis() - startTime));
-                    while ((System.currentTimeMillis() - startTime) < 5000) {
+                    while ((System.currentTimeMillis() - startTime) < 8000) {
                         System.out.println(">>>Inside time" + (System.currentTimeMillis() - startTime));
 
                         try {
@@ -295,7 +296,7 @@ public class Client {
                             //Wait for a response
                             byte[] receiveBuf = new byte[15000];
                             DatagramPacket receivePacket = new DatagramPacket(receiveBuf, receiveBuf.length);
-                            datagramSocket.setSoTimeout(5000);
+                            datagramSocket.setSoTimeout(7000);
                             datagramSocket.receive(receivePacket);
 
                             //We have a response
@@ -326,11 +327,6 @@ public class Client {
                     System.out.println(ex.getMessage());
 
                 }
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             };
 
         }
@@ -359,6 +355,10 @@ public class Client {
 
     public void StopReceivingInet() throws InterruptedException {
         receiverThreadCanRun = false;
+        Sender sender = new Sender(null);
+        Thread thread = new Thread(sender);
+        thread.setDaemon(true);
+        thread.start();
 
     }
 
@@ -388,6 +388,7 @@ public class Client {
         public void run() {
             while(receiverThreadCanRun) {
                 load = receive();
+                if(load == null) break;
                 controller.ReceiveData(load);
                 controller.namelist.add(serverName);
             }

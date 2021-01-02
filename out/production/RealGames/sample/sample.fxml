@@ -1,99 +1,235 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.Reflection?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<StackPane fx:id="stackPane_Main" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="600.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+<StackPane fx:id="stackPane_Main" maxHeight="900.0" maxWidth="1200.0" minHeight="300.0" minWidth="400.0" prefHeight="600.0" prefWidth="600.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
    <children>
-      <AnchorPane fx:id="anchorPane_MainMenu" opacity="0.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
+      <AnchorPane fx:id="anchorPane_MainMenu" disable="true" maxHeight="900.0" maxWidth="1200.0" minHeight="200.0" minWidth="200.0" opacity="0.0" prefHeight="600.0" prefWidth="600.0" styleClass="generalmenu">
          <children>
-            <Label layoutX="140.0" layoutY="62.0" text="Concurrent Math">
-               <font>
-                  <Font name="Goudy Old Style Bold" size="49.0" />
-               </font>
-            </Label>
-            <Button fx:id="button_MMPlay" layoutX="217.0" layoutY="185.0" mnemonicParsing="false" onAction="#buttonPlayClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Play" />
-            <Button fx:id="button_MMOptions" layoutX="217.0" layoutY="275.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Consept" />
-            <Button fx:id="button_MMQuit" layoutX="217.0" layoutY="375.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Quit" />
+            <VBox alignment="TOP_CENTER" fillWidth="false" prefHeight="250.0" prefWidth="600.0" spacing="25.0" AnchorPane.bottomAnchor="350.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <Label alignment="CENTER" styleClass="generaltext" text="Concurrent Math" textAlignment="CENTER">
+                     <font>
+                        <Font name="Goudy Old Style Bold" size="49.0" />
+                     </font>
+                  </Label>
+                  <AnchorPane minHeight="50.0" prefHeight="149.0" prefWidth="600.0">
+                     <children>
+                        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="73.0" pickOnBounds="true" preserveRatio="true" rotate="-25.0" AnchorPane.leftAnchor="60.0">
+                           <image>
+                              <Image url="@assets/abdullah.png" />
+                           </image>
+                           <effect>
+                              <Reflection />
+                           </effect>
+                        </ImageView>
+                        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="240.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="240.0" AnchorPane.rightAnchor="240.0">
+                           <image>
+                              <Image url="@assets/tayyib.png" />
+                           </image>
+                           <effect>
+                              <Reflection />
+                           </effect>
+                        </ImageView>
+                        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="428.0" pickOnBounds="true" preserveRatio="true" rotate="25.0" AnchorPane.rightAnchor="60.0">
+                           <image>
+                              <Image url="@assets/yusuf.png" />
+                           </image>
+                           <effect>
+                              <Reflection />
+                           </effect>
+                        </ImageView>
+                     </children>
+                  </AnchorPane>
+               </children>
+               <padding>
+                  <Insets top="25.0" />
+               </padding>
+            </VBox>
+            <AnchorPane layoutY="300.0" minHeight="300.0" prefHeight="300.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="251.0">
+               <children>
+                  <VBox alignment="TOP_CENTER" layoutX="200.0" maxHeight="800.0" maxWidth="600.0" minHeight="150.0" minWidth="150.0" prefHeight="300.0" prefWidth="200.0" spacing="50.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <Button fx:id="button_MMPlay" maxHeight="200.0" maxWidth="600.0" minHeight="25.0" minWidth="100.0" mnemonicParsing="false" onAction="#buttonPlayClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Play" />
+                        <Button fx:id="button_MMOptions" maxHeight="200.0" maxWidth="600.0" minHeight="25.0" minWidth="100.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Consept" />
+                        <Button fx:id="button_MMQuit" maxHeight="200.0" maxWidth="600.0" minHeight="25.0" minWidth="100.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Quit" />
+                     </children>
+                     <padding>
+                        <Insets top="25.0" />
+                     </padding>
+                  </VBox>
+               </children>
+            </AnchorPane>
          </children>
          <StackPane.margin>
             <Insets />
          </StackPane.margin>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPane_Play" layoutX="10.0" layoutY="10.0" opacity="0.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
+      <AnchorPane fx:id="anchorPane_Play" disable="true" layoutX="10.0" layoutY="10.0" opacity="0.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
          <children>
-            <Label layoutX="274.0" layoutY="67.0" text="Play">
-               <font>
-                  <Font name="Goudy Old Style Bold" size="49.0" />
-               </font>
-            </Label>
-            <Button fx:id="button_PCreateRoom" layoutX="217.0" layoutY="185.0" mnemonicParsing="false" onAction="#buttonCreateRoomClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Create Room" />
-            <Button fx:id="button_PSearchRoom" layoutX="217.0" layoutY="343.0" mnemonicParsing="false" onAction="#buttonSearchRoomClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Search Room" />
-            <TextField fx:id="textField_PJoinRoomID" layoutX="241.0" layoutY="308.0" promptText="Enter The ID" />
+            <VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="600.0" spacing="50.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <Label styleClass="generaltext" text="Play">
+                     <font>
+                        <Font name="Goudy Old Style Bold" size="49.0" />
+                     </font>
+                     <padding>
+                        <Insets bottom="25.0" />
+                     </padding>
+                  </Label>
+                  <Button fx:id="button_PCreateRoom" maxHeight="200.0" maxWidth="600.0" minHeight="25.0" minWidth="100.0" mnemonicParsing="false" onAction="#buttonCreateRoomClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Create Room" />
+                  <Button fx:id="button_PSearchRoom" maxHeight="200.0" maxWidth="600.0" minHeight="25.0" minWidth="100.0" mnemonicParsing="false" onAction="#buttonSearchRoomClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Search Room" />
+                  <Button fx:id="button_PBack" layoutX="10.0" layoutY="117.0" maxHeight="200.0" maxWidth="600.0" minHeight="25.0" minWidth="100.0" mnemonicParsing="false" onAction="#buttonPBackClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Back" />
+               </children>
+               <padding>
+                  <Insets top="25.0" />
+               </padding>
+            </VBox>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPane_Room" layoutX="10.0" layoutY="10.0" opacity="0.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
+      <AnchorPane fx:id="anchorPane_Room" disable="true" layoutX="10.0" layoutY="10.0" opacity="0.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
          <children>
-            <Label layoutX="65.0" layoutY="66.0" text="Room">
-               <font>
-                  <Font name="Goudy Old Style Bold" size="49.0" />
-               </font>
-            </Label>
-            <Button fx:id="button_RStartGame" layoutX="379.0" layoutY="521.0" mnemonicParsing="false" onAction="#buttonStartGameClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Start Game" />
-            <Button fx:id="button_RCancelRoom" layoutX="164.0" layoutY="521.0" mnemonicParsing="false" onAction="#buttonRoomBackClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Cancel Room" />
-            <TextField fx:id="textField_RRoomName" alignment="CENTER" layoutX="362.0" layoutY="73.0" onAction="#textFieldRoomNameChange" prefHeight="43.0" prefWidth="217.0" promptText="Enter Room Name" text="Room" AnchorPane.leftAnchor="350.0" AnchorPane.rightAnchor="25.0">
-               <font>
-                  <Font size="27.0" />
-               </font>
-            </TextField>
-            <VBox fx:id="vBox_RoomPlayerList" alignment="CENTER" layoutX="48.0" layoutY="139.0" prefHeight="352.0" prefWidth="159.0" spacing="5.0" />
-            <ListView fx:id="listView_RLog" prefHeight="362.0" prefWidth="171.0" AnchorPane.bottomAnchor="150.0" AnchorPane.leftAnchor="350.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="175.0" />
+            <Button fx:id="button_RCancelRoom" layoutX="156.0" layoutY="536.0" mnemonicParsing="false" onAction="#buttonRoomBackClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Cancel Room" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="250.0" />
+            <Button fx:id="button_RStartGame" layoutX="386.0" layoutY="536.0" mnemonicParsing="false" onAction="#buttonStartGameClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Start Game" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="25.0" />
+            <HBox prefHeight="500.0" prefWidth="600.0" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <VBox alignment="TOP_CENTER" maxHeight="900.0" maxWidth="600.0" minHeight="200.0" minWidth="300.0" prefHeight="510.0" prefWidth="333.0" spacing="50.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="generaltext" text="Room">
+                           <font>
+                              <Font name="Goudy Old Style Bold" size="49.0" />
+                           </font>
+                        </Label>
+                        <VBox fx:id="vBox_RoomPlayerList" alignment="TOP_CENTER" maxHeight="800.0" maxWidth="600.0" minHeight="200.0" minWidth="150.0" prefHeight="400.0" prefWidth="300.0" spacing="5.0" VBox.vgrow="ALWAYS">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="10.0" right="10.0" />
+                           </VBox.margin>
+                        </VBox>
+                     </children>
+                     <padding>
+                        <Insets top="25.0" />
+                     </padding>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER" prefHeight="510.0" prefWidth="250.0" spacing="50.0">
+                     <padding>
+                        <Insets top="25.0" />
+                     </padding>
+                     <children>
+                        <TextField fx:id="textField_RRoomName" alignment="CENTER" onAction="#textFieldRoomNameChange" prefHeight="43.0" prefWidth="217.0" promptText="Enter Room Name" text="Room">
+                           <font>
+                              <Font size="27.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </VBox.margin>
+                        </TextField>
+                        <ListView fx:id="listView_RLog" prefHeight="400.0" prefWidth="240.0" VBox.vgrow="ALWAYS">
+                           <VBox.margin>
+                              <Insets bottom="5.0" left="5.0" right="5.0" />
+                           </VBox.margin>
+                        </ListView>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
          </children>
       </AnchorPane>
       <AnchorPane fx:id="anchorPane_FindRooms" disable="true" layoutX="10.0" layoutY="10.0" opacity="0.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
          <children>
-            <Label layoutX="65.0" layoutY="66.0" text="Games">
-               <font>
-                  <Font name="Goudy Old Style Bold" size="49.0" />
-               </font>
-            </Label>
-            <Button fx:id="button_FRJoinRoom" layoutX="379.0" layoutY="521.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Join Room" />
-            <Button fx:id="button_FRBack" layoutX="164.0" layoutY="521.0" mnemonicParsing="false" onAction="#buttonFindRoomBackClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Back" />
-            <VBox fx:id="vBox_FRRoomList" alignment="CENTER" layoutX="48.0" layoutY="139.0" prefHeight="352.0" prefWidth="159.0" spacing="10.0" />
+            <Button fx:id="button_FRJoinRoom" layoutX="386.0" layoutY="536.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Join Room" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="25.0" />
+            <Button fx:id="button_FRBack" layoutX="165.0" layoutY="536.0" mnemonicParsing="false" onAction="#buttonFindRoomBackClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Back" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="250.0" />
+            <VBox prefHeight="506.0" prefWidth="600.0" spacing="50.0" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <Label styleClass="generaltext" text="Games">
+                     <font>
+                        <Font name="Goudy Old Style Bold" size="49.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="50.0" />
+                     </VBox.margin>
+                  </Label>
+                  <VBox fx:id="vBox_FRRoomList" alignment="TOP_CENTER" prefHeight="352.0" prefWidth="531.0" spacing="10.0" VBox.vgrow="ALWAYS">
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" />
+                     </VBox.margin>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets top="50.0" />
+               </padding>
+            </VBox>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPane_GameMath" disable="true" layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
+      <AnchorPane fx:id="anchorPane_GameMath" layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="200.0" styleClass="generalmenu">
          <children>
-            <Label layoutX="178.0" layoutY="28.0" text="Math">
-               <font>
-                  <Font name="Goudy Old Style Bold" size="49.0" />
-               </font>
-            </Label>
-            <Button fx:id="button_GMSendAnswer" layoutX="110.0" layoutY="441.0" mnemonicParsing="false" onAction="#buttonSendAnswer" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Send!">
-               <font>
-                  <Font size="21.0" />
-               </font>
-            </Button>
-            <TextField fx:id="textField_GMAnswer" layoutX="77.0" layoutY="354.0" onAction="#buttonSendAnswer" prefHeight="57.0" prefWidth="265.0" promptText="Enter Your Answer" />
-            <Label fx:id="label_Question" alignment="TOP_CENTER" layoutX="32.0" layoutY="149.0" maxHeight="170.0" maxWidth="400.0" prefHeight="171.0" prefWidth="401.0" text="Level 1" wrapText="true">
-               <font>
-                  <Font name="Goudy Old Style Bold" size="40.0" />
-               </font>
-            </Label>
-            <VBox fx:id="vBox_GMPlayer" alignment="CENTER" layoutX="451.0" prefHeight="600.0" prefWidth="135.0" spacing="10.0" />
-            <Label fx:id="label_GMScore" layoutX="84.0" layoutY="519.0" maxHeight="90.0" maxWidth="250.0" prefHeight="71.0" prefWidth="250.0" wrapText="true" />
-            <Button fx:id="button_GMSendAnswer1" layoutX="342.0" layoutY="494.0" mnemonicParsing="false" onAction="#buttonNextQuestion" prefHeight="50.0" prefWidth="108.0" styleClass="generalbuttons" text="Next">
-               <font>
-                  <Font size="21.0" />
-               </font>
-            </Button>
-            <Label fx:id="label_Timer" alignment="CENTER" layoutX="200.0" layoutY="100.0" prefHeight="25.0" prefWidth="65.0" text="00:00">
-               <font>
-                  <Font size="16.0" />
-               </font>
-            </Label>
+            <HBox prefHeight="600.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <VBox alignment="TOP_CENTER" maxHeight="800.0" maxWidth="600.0" minHeight="400.0" minWidth="300.0" prefHeight="600.0" prefWidth="417.0" spacing="20.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label styleClass="generaltext" text="Math">
+                           <font>
+                              <Font name="Goudy Old Style Bold" size="49.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="label_Timer" alignment="CENTER" prefHeight="25.0" prefWidth="65.0" text="00:00">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="label_Question" alignment="TOP_CENTER" maxHeight="200.0" maxWidth="600.0" prefHeight="170.0" prefWidth="400.0" text="Level 1" wrapText="true">
+                           <font>
+                              <Font name="Goudy Old Style Bold" size="40.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets left="5.0" right="5.0" />
+                           </VBox.margin>
+                        </Label>
+                        <TextField fx:id="textField_GMAnswer" alignment="CENTER" onAction="#buttonSendAnswer" prefHeight="60.0" prefWidth="265.0" promptText="Enter Your Answer">
+                           <VBox.margin>
+                              <Insets left="25.0" right="25.0" />
+                           </VBox.margin>
+                        </TextField>
+                        <Button fx:id="button_GMSendAnswer" mnemonicParsing="false" onAction="#buttonSendAnswer" prefHeight="50.0" prefWidth="200.0" styleClass="minorbutton" text="Send!">
+                           <font>
+                              <Font size="21.0" />
+                           </font>
+                        </Button>
+                        <Label fx:id="label_GMScore" maxHeight="90.0" maxWidth="250.0" prefHeight="30.0" prefWidth="250.0" styleClass="generaltext" wrapText="true" />
+                        <AnchorPane prefHeight="50.0" prefWidth="417.0">
+                           <children>
+                              <Button fx:id="button_GMLeaveGame" layoutX="217.0" mnemonicParsing="false" onAction="#buttonGMLeaveGameClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Leave Game" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="10.0" left="5.0" right="5.0" />
+                           </VBox.margin>
+                        </AnchorPane>
+                     </children>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                     <padding>
+                        <Insets top="25.0" />
+                     </padding>
+                  </VBox>
+                  <VBox fx:id="vBox_GMPlayer" alignment="TOP_CENTER" maxHeight="800.0" maxWidth="300.0" minHeight="100.0" minWidth="100.0" prefHeight="600.0" prefWidth="183.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                     <padding>
+                        <Insets left="5.0" right="5.0" top="10.0" />
+                     </padding>
+                  </VBox>
+               </children>
+            </HBox>
          </children>
       </AnchorPane>
    </children>

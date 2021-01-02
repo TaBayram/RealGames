@@ -50,10 +50,10 @@ public class Server {
 
     public void StopMainServer() {
         mainServerThreadCanRun = false;
-
+        if(mainServerThread == null || !mainServerThread.isAlive()) return;
         try{
             for(ConnectedSocketsThread socketsThread: clients){
-                socketsThread.Disconnect();
+                socketsThread.Disconnect(false);
             }
         }
         catch(Exception exception){
@@ -76,11 +76,12 @@ public class Server {
         ServerSocket serverSocket;
         ObjectInputStream objectInputStream;
         ObjectOutputStream objectOutputStream;
+        Thread discoveryThread;
 
         @Override
         public void run() {
             try{
-                Thread discoveryThread = new Thread(DiscoveryThread.getInstance());
+                discoveryThread = new Thread(DiscoveryThread.getInstance());
                 discoveryThread.start();
 
                 serverSocket = new ServerSocket(6666);
@@ -234,7 +235,7 @@ public class Server {
                         var packetPlayer = (DataPackages.Player) (packet);
 
                         if(packetPlayer.isLeaving()){
-                            Disconnect();
+                            Disconnect(true);
                         }
 
 
@@ -296,21 +297,19 @@ public class Server {
                 }
 
             }
-            Disconnect();
+            Disconnect(true);
         }
 
-        public void Disconnect(){
+        public void Disconnect(boolean announce){
             try {
                 if(socket.isClosed()) return;
                 canRun = false;
 
                 player.setLeaving(true);
-                mainServerThread.SendLeavingPlayerPacket(this);
 
-                var objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                objectOutputStream.writeObject(player);
-                objectOutputStream.flush();
+                if(announce) mainServerThread.SendLeavingPlayerPacket(this);
 
+                ObjectFlushSelf(player);
 
                 if (objectInputStream != null)
                     objectInputStream.close();
@@ -414,6 +413,7 @@ public class Server {
                     DatagramPacket packet = new DatagramPacket(receiveBuf, receiveBuf.length);
                     try {
                         datagramSocket.receive(packet);
+                        System.out.println(getClass().getName() + "###Discovery Stop:" );
                     }
                     catch(Exception exception){
                         break;

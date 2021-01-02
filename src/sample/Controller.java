@@ -11,6 +11,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.WindowEvent;
 
 import java.net.InetAddress;
 import java.util.*;
@@ -42,12 +43,13 @@ public class Controller {
     public Button button_RCancelRoom;
     public Label label_Question;
     public Label label_GMScore;
-    public Button button_GMSendAnswer1;
     public VBox vBox_GMPlayer;
     public Label label_Timer;
+    public Button button_GMLeaveGame;
 
 
     public void initialize() {
+
         HideOtherMainsExceptThis(anchorPane_MainMenu);
         client = new Client(this);
         server = new Server(this);
@@ -72,8 +74,8 @@ public class Controller {
     //PLAY MENU SCREEN
 
     public void buttonCreateRoomClick(ActionEvent actionEvent) {
-        TextInputDialog dialog = new TextInputDialog("Enter Name");
-        dialog.setTitle("Text Input Dialog");
+        TextInputDialog dialog = new TextInputDialog("YAT");
+        dialog.setTitle("Name");
         dialog.setHeaderText(null);
         dialog.setContentText("Please enter your name:");
 
@@ -108,10 +110,7 @@ public class Controller {
                 Platform.runLater(() -> {
                     vBox_FRRoomList.getChildren().removeAll();
                     vBox_FRRoomList.getChildren().clear();
-                   /* for (InetAddress inetAddress:list) {
-                        Button button = new Button(""+inetAddress.getHostAddress());
-                        vBox_RoomList.getChildren().add(button);
-                    }*/
+
                     for(int i = 0; i < inetAddresses.size(); i ++){
                         ServerListCreateServerBox(inetAddresses.get(i),namelist.get(i));
                     }
@@ -127,6 +126,11 @@ public class Controller {
 
 
     }
+
+    public void buttonPBackClick(ActionEvent actionEvent) {
+        HideOtherMainsExceptThis(anchorPane_MainMenu);
+    }
+
 
     //FIND ROOM SCREEN
 
@@ -169,8 +173,8 @@ public class Controller {
     }
 
     private void JoinARoomButtonClick(ActionEvent actionEvent,InetAddress inetAddress,String roomName){
-        TextInputDialog dialog = new TextInputDialog("Enter Name");
-        dialog.setTitle("Text Input Dialog");
+        TextInputDialog dialog = new TextInputDialog("YAT");
+        dialog.setTitle("Name");
         dialog.setHeaderText(null);
         dialog.setContentText("Please enter your name:");
 
@@ -286,7 +290,7 @@ public class Controller {
                 long seconds = (new Date(System.currentTimeMillis()).getTime()-starTime.getTime())/1000;
                 int score =  (int)Math.round(((10.0/(10.0 + seconds) )*mathQuestion.getPoint()));
 
-                label_GMScore.setText("Completed in " +seconds + " seconds \n    Point: " + score);
+                label_GMScore.setText("Solved in " +seconds + " seconds. \n\t +" + score + " Points!");
 
 
                 Client.playerMe.setScore(Client.playerMe.getScore() + score);
@@ -306,12 +310,6 @@ public class Controller {
     public void ShowGameScreenAndStartTheClock(){
         Platform.runLater(() -> {
             HideOtherMainsExceptThis(anchorPane_GameMath);
-            if(isServerOwner) {
-                button_GMSendAnswer1.setDisable(false);
-            }
-            else{
-                button_GMSendAnswer1.setDisable(true);
-            }
            if(isServerOwner) client.mainClientThread.StartGame();
             for (DataPackages.Player player : players) {
                 GamePlayerScoreBox gamePlayerScoreBox = new GamePlayerScoreBox(vBox_GMPlayer, player);
@@ -338,7 +336,7 @@ public class Controller {
         Platform.runLater(() -> {
 
             questionCountdown = 8;
-            gameLevelTime = 10 + mathQuestion.getLevel()*2;
+            gameLevelTime = 10 + mathQuestion.getLevel()*1.50;
 
             TimerTask questionTask = new TimerTask() {
                 @Override
@@ -398,8 +396,6 @@ public class Controller {
         });
     }
 
-
-
     public void EndCurrentLevel(){
         Platform.runLater(()->{
             gameModeCanAnswer = false;
@@ -417,6 +413,29 @@ public class Controller {
 
 
         });
+
+    }
+
+    public void buttonGMLeaveGameClick(ActionEvent actionEvent) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Leave Game");
+        if(isServerOwner) alert.setContentText("If you leave the game will end for everyone! Are you sure?");
+        else
+            alert.setContentText("Are you sure leaving the game?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK){
+            if(isServerOwner){
+                StopServer();
+            }
+            else{
+                StopClient();
+                HideOtherMainsExceptThis(anchorPane_Play);
+            }
+
+        } else {
+
+        }
 
     }
 
@@ -466,6 +485,8 @@ public class Controller {
             HideOtherMainsExceptThis(anchorPane_Play);
         });
     }
+
+
 
 
     private class GamePlayerScoreBox{
@@ -604,6 +625,21 @@ public class Controller {
 
     public void SendAnswer(DataPackages.MathQuestion mathQuestion){
         client.mainClientThread.SendAnswer(mathQuestion);
+    }
+
+
+    public void StopEverything(){
+        StopClient();
+        StopServer();
+        StopSearchingServers();
+
+        if(this.timer_GameCountdown != null)
+            this.timer_GameCountdown.cancel();
+        if(this.timer_FindServer != null)
+            this.timer_FindServer.cancel();
+        if(this.timer_GameLevelTime != null)
+            this.timer_GameLevelTime.cancel();;
+
     }
 
 

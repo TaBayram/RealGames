@@ -2,10 +2,13 @@ package sample;
 
 import javafx.application.Application;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
@@ -59,10 +62,29 @@ public class Main extends Application {
         System.out.println("Your current Hostname : " + hostname);*/
 
 
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("Hello World");
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("sample.fxml"));
+        Parent root = loader.load();
+        Controller controller = loader.getController();
+        primaryStage.setMinWidth(400);
+        primaryStage.setMinHeight(300);
+        primaryStage.setMaxHeight(900);
+        primaryStage.setMaxWidth(1200);
+        primaryStage.setTitle("ConMath");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
+
+
+
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent windowEvent) {
+                controller.StopEverything();
+
+
+            }
+        });
+
+
 
 
 

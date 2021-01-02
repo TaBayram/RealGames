@@ -1,19 +1,25 @@
 
 
 .generalmenu{
-    -fx-background-color: #AAAAAA;
+    -fx-background-color: #006f5e;
+}
+
+.generaltext{
+    -fx-text-fill: #fafffa;
 }
 
 .generalbuttons{
+    -fx-font-size: 15px;
+    -fx-fill: #000000;
     -fx-background-color: #FFFFDD;
 }
 
 .generalbuttons:hover{
-    -fx-background-color: #BBBBAA;
+    -fx-background-color: #baba97;
 }
 
 .generalbuttons:pressed{
-    -fx-background-color: #9cb8ff;
+    -fx-background-color: #ffffa3;
     -fx-effect: dropshadow( one-pass-box , rgba(200,200,255,0.50) , 4, 25.0 , 0 , 0);
 }
 
@@ -44,4 +50,23 @@
 
 .gameplayertext{
     -fx-text-fill: #1c0e0e;
+}
+
+
+
+
+.list-cell:filled:selected:focused, .list-cell:filled:selected{
+    -fx-text-fill: #050d0b;
+}
+
+.list-view .list-cell:even {
+    -fx-background-color: #daede7;
+}
+
+.list-view .list-cell:odd {
+    -fx-background-color: #daede7;
+}
+
+.list-cell:filled:hover {
+    -fx-text-fill: #132b24;
 }
