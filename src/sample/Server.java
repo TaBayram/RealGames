@@ -262,6 +262,9 @@ public class Server {
                             }
 
                             if(hasAllSent){
+                                for (ConnectedSocketsThread socketsThread:clients) {
+                                    socketsThread.player.setHasSentAnswer(false);
+                                }
                                 DataPackages.GameCommand gameCommand = new DataPackages().new GameCommand();
                                 gameCommand.setHasEveryoneSentAnswer(true);
                                 ObjectFlushAll(gameCommand);

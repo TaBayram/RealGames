@@ -536,6 +536,7 @@ public class Controller {
         }
 
         public void SetScore(int score){
+            player.setScore(score);
             previousPoint = score - previousPoint;
             labelTotalScore.setText("Total "+player.getScore());
             labelPreviousLevelPoint.setText("Previous Point "+ previousPoint );
