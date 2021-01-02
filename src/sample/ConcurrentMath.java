@@ -17,11 +17,11 @@ public class ConcurrentMath {
 
 
     public void CreateQuestion(){
-        List<Double> numbers = new ArrayList<>();
+        List<Integer> numbers = new ArrayList<>();
 
         int numberAmount = level/5 + 2;
         for(int i = 0; i < numberAmount; i++){
-            double number = level*5 + random.nextInt(level*15);
+            int number = level*5 + random.nextInt(level*15);
             numbers.add(number);
         }
 
@@ -43,20 +43,70 @@ public class ConcurrentMath {
                 question += "-";
                 question += Math.round(numbers.get(i));
             }
-            if(a == 3){
-                result += numbers.get(i);
-
-                if(i != 0) question += "+";
-                question += Math.round(numbers.get(i));
-            }
 
         }
 
-        /*
+/*
+        ArrayList<String> equation = new ArrayList();
         for(int i = 0; i < numbers.size(); i++){
-            question += Math.round(numbers.get(i));
-            if(i != numbers.size()-1) question += "+";
-        }*/
+            if(i == 0){
+                equation.add(""+numbers.get(i));
+                continue;
+            }
+            int operation = random.nextInt(3);
+
+            if(operation == 0){
+                equation.add("+");
+                equation.add(""+numbers.get(i));
+            }
+            else if(operation == 1){
+                equation.add("-");
+                equation.add(""+numbers.get(i));
+            }
+            else if(operation == 2){
+                equation.add("x");
+                equation.add(""+numbers.get(i));
+            }
+
+
+
+        }
+
+        for(String str: equation){
+            question+= str;
+        }
+
+        int smallResult = 0;
+        for(int i = 0; i < equation.size(); i++){
+            if(equation.get(i) == "x"){
+                smallResult = Integer.parseInt(equation.get(i-1)) * Integer.parseInt(equation.get(i+1));
+                equation.remove(i-1);
+                equation.remove(i-1);
+                equation.set(i-1,smallResult+"");
+
+            }
+
+        }
+        for(int i = 0; i < equation.size(); i++){
+            if(equation.get(i) == "+"){
+                smallResult = Integer.parseInt(equation.get(i-1)) + Integer.parseInt(equation.get(i+1));
+                equation.remove(i-1);
+                equation.remove(i-1);
+                equation.set(i-1,smallResult+"");
+
+            }
+            else if(equation.get(i) == "-"){
+                smallResult = Integer.parseInt(equation.get(i-1)) - Integer.parseInt(equation.get(i+1));
+                equation.remove(i-1);
+                equation.remove(i-1);
+                equation.set(i-1,smallResult+"");
+
+            }
+
+        }
+        result = Integer.parseInt(equation.get(0));
+*/
+
 
         answer = result;
         this.question = question;

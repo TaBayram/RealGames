@@ -11,7 +11,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.WindowEvent;
 
 import java.net.InetAddress;
 import java.util.*;
@@ -218,10 +217,7 @@ public class Controller {
     public void buttonStartGameClick(ActionEvent actionEvent) {
         if(isServerOwner){
             client.mainClientThread.EnterGame();
-
-            //HideOtherMainsExceptThis(anchorPane_GameMath);
-
-
+            client.mainClientThread.StartGame();
         }
 
     }
@@ -271,11 +267,14 @@ public class Controller {
     Timer timer_GameCountdown;
     Timer timer_GameLevelTime;
 
-    boolean gameModeHasSent = false;
-    boolean gameModeCanAnswer = false;
-    boolean hasGotTheNextLevelQuestion = false;
+    boolean gMHasSentAnswer = false;
+    boolean gMCanAnswer = false;
+    boolean gmHasGottenNextQuestion = false;
+    boolean gMCountdownFinished = false;
+
     int questionCountdown = 8;
     double gameLevelTime = 10;
+
     Date starTime = new Date(System.currentTimeMillis());
     DataPackages.MathQuestion mathQuestion = new DataPackages().new MathQuestion();
 
@@ -285,13 +284,14 @@ public class Controller {
             String gmAnswerText = textField_GMAnswer.getText();
             double answer = Double.parseDouble(gmAnswerText);
 
-            if(answer == mathQuestion.getAnswer() && !gameModeHasSent && gameModeCanAnswer){
-                gameModeHasSent = true;
+            if(answer == mathQuestion.getAnswer() && !gMHasSentAnswer && gMCanAnswer){
+                gMHasSentAnswer = true;
+
                 label_Question.setText("CORRECT");
                 long seconds = (new Date(System.currentTimeMillis()).getTime()-starTime.getTime())/1000;
-                int score =  (int)Math.round(((10.0/(10.0 + seconds) )*mathQuestion.getPoint()));
+                int score =  (int)Math.round(((5.0/(5.0 + seconds) )*mathQuestion.getPoint()));
 
-                label_GMScore.setText("Solved in " +seconds + " seconds. \n\t +" + score + " Points!");
+                label_GMScore.setText("Solved in " +seconds + " seconds. \t +" + score + " Points!");
 
 
                 Client.playerMe.setScore(Client.playerMe.getScore() + score);
@@ -311,7 +311,6 @@ public class Controller {
     public void ShowGameScreenAndStartTheClock(){
         Platform.runLater(() -> {
             HideOtherMainsExceptThis(anchorPane_GameMath);
-           if(isServerOwner) client.mainClientThread.StartGame();
             for (DataPackages.Player player : players) {
                 GamePlayerScoreBox gamePlayerScoreBox = new GamePlayerScoreBox(vBox_GMPlayer, player);
                 gamePlayerScoreBoxes.add(gamePlayerScoreBox);
@@ -329,26 +328,27 @@ public class Controller {
                 gamePlayerScoreBox.SetScore(score);
             }
         }
+
         });
     }
 
-    boolean countdownFinished = false;
+
     public void PrepareForNextLevel(){
-        if(hasGotTheNextLevelQuestion) return;
+        if(gmHasGottenNextQuestion) return;
         System.out.println("¤¤¤Next Level Preparation");
 
         Platform.runLater(() -> {
 
             questionCountdown = 8;
             gameLevelTime = 10 + mathQuestion.getLevel()*1.50;
-
-            countdownFinished = false;
+            gmHasGottenNextQuestion = true;
+            gMCountdownFinished = false;
             TimerTask questionTask = new TimerTask() {
                 @Override
                 public void run() {
                     Platform.runLater(() -> {
-                        if (questionCountdown <= 0 && !countdownFinished) {
-                            countdownFinished = true;
+                        if (questionCountdown <= 0 && !gMCountdownFinished) {
+                            gMCountdownFinished = true;
                             TimerTask gameLevelTimeTimerTask = new TimerTask() {
                                 @Override
                                 public void run() {
@@ -369,7 +369,7 @@ public class Controller {
                             timer_GameLevelTime = new Timer();
                             timer_GameLevelTime.schedule(gameLevelTimeTimerTask, 0, 500);
 
-                            gameModeHasSent = false;
+                            gMHasSentAnswer = false;
                             starTime = new Date(System.currentTimeMillis());
                             label_Question.setText(mathQuestion.getQuestion());
 
@@ -378,7 +378,7 @@ public class Controller {
                             if(questionCountdown == 2){
                                 textField_GMAnswer.setEditable(true);
                                 textField_GMAnswer.setText("");
-                                gameModeCanAnswer = true;
+                                gMCanAnswer = true;
                             }
                             label_Question.setText("Level " + mathQuestion.getLevel() + " in "+questionCountdown + "...");
 
@@ -402,15 +402,24 @@ public class Controller {
 
     public void EndCurrentLevel(){
         Platform.runLater(()->{
-            gameModeCanAnswer = false;
-            hasGotTheNextLevelQuestion = false;
+            if(!gmHasGottenNextQuestion) return;
+            gMCanAnswer = false;
+            gmHasGottenNextQuestion = false;
 
             label_Question.setText("Answer: "+ mathQuestion.getAnswer() );
             textField_GMAnswer.setEditable(false);
             label_Timer.setText("00:00");
 
 
-            if(isServerOwner) client.mainClientThread.StartGame();
+
+            if(isServerOwner) {
+
+                if(mathQuestion.getLevel() == 10){
+                    EndGameShowWinner();
+                }
+                else
+                NextLevel();
+            }
 
 
             timer_GameLevelTime.cancel();
@@ -418,6 +427,22 @@ public class Controller {
 
 
         });
+
+    }
+
+    public void EndGameShowWinner(){
+        FinishGame();
+
+        var winnerPlayer = players.get(0);
+        for (DataPackages.Player player:players) {
+            if (player.getScore() > winnerPlayer.getScore()){
+                winnerPlayer = player;
+            }
+
+        }
+
+        label_Question.setText("WINNER: " + winnerPlayer.getName() + "\n\t Score: " + winnerPlayer.getScore());
+
 
     }
 
@@ -613,6 +638,13 @@ public class Controller {
     }
 
     public void StartServer(){
+        vBox_RoomPlayerList.getChildren().clear();
+        vBox_GMPlayer.getChildren().clear();
+        listView_RLog.getItems().clear();
+        players.clear();
+
+
+
         server.StartMainServer();
     }
 
@@ -633,6 +665,28 @@ public class Controller {
         client.mainClientThread.SendAnswer(mathQuestion);
     }
 
+    public void StartGame(){
+        client.mainClientThread.StartGame();
+
+    }
+
+    public void StopGame(){
+
+
+    }
+
+    public void NextLevel(){
+        client.mainClientThread.NextLevel();
+
+    }
+
+    public void FinishGame(){
+        if(this.timer_GameCountdown != null)
+            this.timer_GameCountdown.cancel();
+        if(this.timer_GameLevelTime != null)
+            this.timer_GameLevelTime.cancel();;
+
+    }
 
     public void StopEverything(){
         StopClient();

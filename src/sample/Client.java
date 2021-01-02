@@ -130,11 +130,15 @@ public class Client {
 
                         if(packetGameCommand.isEntering()){
                             controller.ShowGameScreenAndStartTheClock();
+
                         }
                         else if(packetGameCommand.isExiting()){
                             controller.ShowPlayBecauseYouGotKicked();
                         }
                         else if(packetGameCommand.isHasEveryoneSentAnswer()){
+                            controller.EndCurrentLevel();
+                        }
+                        else if(packetGameCommand.isEnding()){
                             controller.EndCurrentLevel();
                         }
 
@@ -144,7 +148,7 @@ public class Client {
                     else if(packet.getClass() == DataPackages.MathQuestion.class){
                         var packetMathQuestion = (DataPackages.MathQuestion)(packet);
 
-                        //RECEIVING QUESTION AND STARTING THE CLCOK
+                        //RECEIVING QUESTION AND STARTING THE CLOCK
                         if(packetMathQuestion.isSendingQuestion()){
                             controller.mathQuestion = packetMathQuestion;
                             controller.PrepareForNextLevel();
@@ -170,10 +174,18 @@ public class Client {
             gameCommand.setExiting(true);
             ObjectFlush(gameCommand);
         }
+
         public void StartGame(){
             DataPackages.GameCommand gameCommand = new DataPackages().new GameCommand();
             gameCommand.setStarting(true);
             ObjectFlush(gameCommand);
+        }
+
+        public void NextLevel(){
+            DataPackages.GameCommand gameCommand = new DataPackages().new GameCommand();
+            gameCommand.setNextLevel(true);
+            ObjectFlush(gameCommand);
+
         }
 
 
@@ -296,7 +308,7 @@ public class Client {
                     System.out.println(Client.class.getName() + ">>> Done looping over all network interfaces. Now waiting for a reply!");
                     long startTime = System.currentTimeMillis();
                     System.out.println(">>>Outside time" + (System.currentTimeMillis() - startTime));
-                    while ((System.currentTimeMillis() - startTime) < 8000) {
+                    while ((System.currentTimeMillis() - startTime) < 8000 && findServersThreadCanRun) {
                         System.out.println(">>>Inside time" + (System.currentTimeMillis() - startTime));
 
                         try {
@@ -305,7 +317,7 @@ public class Client {
                             //Wait for a response
                             byte[] receiveBuf = new byte[15000];
                             DatagramPacket receivePacket = new DatagramPacket(receiveBuf, receiveBuf.length);
-                            datagramSocket.setSoTimeout(7000);
+                            datagramSocket.setSoTimeout(2000);
                             datagramSocket.receive(receivePacket);
 
                             //We have a response

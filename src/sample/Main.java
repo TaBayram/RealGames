@@ -68,7 +68,7 @@ public class Main extends Application {
         primaryStage.setMinWidth(400);
         primaryStage.setMinHeight(300);
         primaryStage.setMaxHeight(900);
-        primaryStage.setMaxWidth(1200);
+        primaryStage.setMaxWidth(900);
         primaryStage.setTitle("ConMath");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();

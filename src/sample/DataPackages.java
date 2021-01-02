@@ -152,14 +152,23 @@ public class DataPackages implements java.io.Serializable{
             this.hasEveryoneSentAnswer = hasEveryoneSentAnswer;
         }
 
+        public boolean isNextLevel() {
+            return NextLevel;
+        }
+
+        public void setNextLevel(boolean nextLevel) {
+            NextLevel = nextLevel;
+        }
+
         private boolean isEntering = false;
         private boolean isExiting = false;
 
         private boolean isStarting = false;
         private boolean isEnding = false;
 
-        boolean hasEveryoneSentAnswer = false;
-        boolean NextLevel = false;
+        private boolean hasEveryoneSentAnswer = false;
+        private boolean NextLevel = false;
+
 
 
     }

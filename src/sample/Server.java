@@ -36,6 +36,8 @@ public class Server {
 
 
     public void StartMainServer(){
+        clients.clear();
+        concurrentMath = new ConcurrentMath();
         mainServerThreadCanRun = true;
         if(!mainServerThread.isAlive()){
             mainServerThread = new MainServer();
@@ -44,8 +46,11 @@ public class Server {
         else{
 
         }
+    }
 
-
+    public void StopDiscoveryThread(){
+        if(DiscoveryThread.datagramSocket != null)
+            DiscoveryThread.datagramSocket.close();
     }
 
     public void StopMainServer() {
@@ -95,7 +100,7 @@ public class Server {
                     }
                     catch(SocketException socketException){
                         System.out.println("###Server Closed");
-                        DiscoveryThread.datagramSocket.close();
+                        StopDiscoveryThread();
                         break;
                     }
 
@@ -282,14 +287,19 @@ public class Server {
 
                         if(packetGameCommand.isEntering()){
                             ObjectFlushAll(packetGameCommand);
-
-
+                            StopDiscoveryThread();
                         }
                         else if(packetGameCommand.isExiting()){
                             ObjectFlushAll(packetGameCommand);
                         }
                         else if(packetGameCommand.isStarting()){
                             nextQuestion();
+                        }
+                        else if(packetGameCommand.isNextLevel()){
+                            nextQuestion();
+                        }
+                        else if(packetGameCommand.isEnding()){
+                            ObjectFlushAll(packetGameCommand);
                         }
                     }
 
@@ -303,7 +313,7 @@ public class Server {
             Disconnect(true);
         }
 
-        public void Disconnect(boolean announce){
+        public synchronized void Disconnect(boolean announce){
             try {
                 if(socket.isClosed()) return;
                 canRun = false;
@@ -416,9 +426,9 @@ public class Server {
                     DatagramPacket packet = new DatagramPacket(receiveBuf, receiveBuf.length);
                     try {
                         datagramSocket.receive(packet);
-                        System.out.println(getClass().getName() + "###Discovery Stop:" );
                     }
                     catch(Exception exception){
+                        System.out.println(getClass().getName() + "###Discovery Stop:" );
                         break;
                     }
 
