@@ -332,20 +332,23 @@ public class Controller {
         });
     }
 
-
+    boolean countdownFinished = false;
     public void PrepareForNextLevel(){
         if(hasGotTheNextLevelQuestion) return;
+        System.out.println("¤¤¤Next Level Preparation");
+
         Platform.runLater(() -> {
 
             questionCountdown = 8;
             gameLevelTime = 10 + mathQuestion.getLevel()*1.50;
 
+            countdownFinished = false;
             TimerTask questionTask = new TimerTask() {
                 @Override
                 public void run() {
                     Platform.runLater(() -> {
-                        if (questionCountdown <= 0) {
-
+                        if (questionCountdown <= 0 && !countdownFinished) {
+                            countdownFinished = true;
                             TimerTask gameLevelTimeTimerTask = new TimerTask() {
                                 @Override
                                 public void run() {
@@ -362,7 +365,6 @@ public class Controller {
 
                                 }
                             };
-
 
                             timer_GameLevelTime = new Timer();
                             timer_GameLevelTime.schedule(gameLevelTimeTimerTask, 0, 500);

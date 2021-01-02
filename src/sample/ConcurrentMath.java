@@ -25,16 +25,38 @@ public class ConcurrentMath {
             numbers.add(number);
         }
 
-        int result = 0;
-        for(int i = 0; i < numbers.size(); i++){
-            result += numbers.get(i);
-        }
+
 
         String question = "";
+        int result = 0;
+        for(int i = 0; i < numbers.size(); i++){
+            int a = random.nextInt(2);
+            if(a == 0){
+                result += numbers.get(i);
+
+                if(i != 0) question += "+";
+                question += Math.round(numbers.get(i));
+            }
+            if(a == 1){
+                result -= numbers.get(i);
+
+                question += "-";
+                question += Math.round(numbers.get(i));
+            }
+            if(a == 3){
+                result += numbers.get(i);
+
+                if(i != 0) question += "+";
+                question += Math.round(numbers.get(i));
+            }
+
+        }
+
+        /*
         for(int i = 0; i < numbers.size(); i++){
             question += Math.round(numbers.get(i));
             if(i != numbers.size()-1) question += "+";
-        }
+        }*/
 
         answer = result;
         this.question = question;
