@@ -78,7 +78,9 @@ public class Client {
                         if(packetPlayer.isJoining()){
                             System.out.println(">>> Player has joined! " +packetPlayer.getName());
                             controller.AddPlayerToList(packetPlayer,true);
-                            controller.players.add(playerMe);
+
+                            //Add Newcomer
+                            controller.players.add(packetPlayer);
 
                         }
                         else if(packetPlayer.isLeaving()){
@@ -98,6 +100,8 @@ public class Client {
                         else if(packetPlayer.isChecking()){
                             playerMe.setID(packetPlayer.getID());
                             controller.AddPlayerToList(playerMe,true);
+
+                            //Add Myself
                             controller.players.add(playerMe);
 
                         }
@@ -113,6 +117,8 @@ public class Client {
                         var packetPlayer = (DataPackages.PlayerList)(packet);
                         for (DataPackages.Player player: packetPlayer.getPlayers()) {
                             controller.AddPlayerToList(player,false);
+
+                            //Add Before Me
                             controller.players.add(player);
                         }
                         this.playerList = packetPlayer;

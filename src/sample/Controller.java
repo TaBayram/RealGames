@@ -273,6 +273,7 @@ public class Controller {
 
     boolean gameModeHasSent = false;
     boolean gameModeCanAnswer = false;
+    boolean hasGotTheNextLevelQuestion = false;
     int questionCountdown = 8;
     double gameLevelTime = 10;
     Date starTime = new Date(System.currentTimeMillis());
@@ -333,6 +334,7 @@ public class Controller {
 
 
     public void PrepareForNextLevel(){
+        if(hasGotTheNextLevelQuestion) return;
         Platform.runLater(() -> {
 
             questionCountdown = 8;
@@ -399,6 +401,7 @@ public class Controller {
     public void EndCurrentLevel(){
         Platform.runLater(()->{
             gameModeCanAnswer = false;
+            hasGotTheNextLevelQuestion = false;
 
             label_Question.setText("Answer: "+ mathQuestion.getAnswer() );
             textField_GMAnswer.setEditable(false);
