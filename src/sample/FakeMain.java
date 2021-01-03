@@ -1,4 +1,4 @@
-package sample.assets;
+package sample;
 
 
 import sample.Main;

@@ -20,6 +20,7 @@ public class Server {
     public static InetAddress serverAddress;
 
     final static List<ConnectedSocketsThread> clients = new ArrayList<>();
+    final static List<PingPong> pingPongs = new ArrayList<>();
 
     private ConcurrentMath concurrentMath = new ConcurrentMath();
 
@@ -109,7 +110,29 @@ public class Server {
                     objectInputStream = new ObjectInputStream(socket.getInputStream());
                     var packet = objectInputStream.readObject();
 
-                    if(packet.getClass() == DataPackages.Player.class){
+
+                    if(packet.getClass() == DataPackages.PinPong.class){
+                        var packetPingPong = (DataPackages.PinPong)(packet);
+
+                        if(packetPingPong.FirstPing){
+
+                            ConnectedSocketsThread connectedSocketsThread = null;
+                            for (ConnectedSocketsThread socketsThread:clients) {
+                                if(socketsThread.socket.getInetAddress().getHostAddress().equals(socket.getInetAddress().getHostAddress())){
+                                    connectedSocketsThread = socketsThread;
+                                    break;
+                                }
+                            }
+
+                            System.out.println("First Ping");
+                            PingPong pingPong = new PingPong(connectedSocketsThread,socket);
+                            pingPong.start();
+                            pingPongs.add(pingPong);
+                        }
+
+                    }
+
+                    else if(packet.getClass() == DataPackages.Player.class){
                         var packetPlayer = (DataPackages.Player)(packet);
 
                         if(packetPlayer.isJoining()){
@@ -400,6 +423,113 @@ public class Server {
 
 
         }
+
+    }
+
+    /*------------------- PING PONG -------------------*/
+
+    class PingPong extends  Thread{
+
+        boolean canRun = true;
+        ConnectedSocketsThread connectedSocketsThread;
+        Socket socket;
+        ObjectOutputStream objectOutputStream;
+        ObjectInputStream objectInputStream;
+        int noPingTimeout = 0;
+
+        PingPong(ConnectedSocketsThread connectedSocketsThread,Socket socket){
+            this.connectedSocketsThread = connectedSocketsThread;
+            this.socket = socket;
+
+        }
+
+        @Override
+        public void run() {
+
+
+            try {
+                socket.setSoTimeout(8000);
+
+                var pinPong = new DataPackages().new PinPong(false);
+                ObjectFlushClient(pinPong);
+
+
+                while(canRun){
+
+                    try{
+                        objectInputStream = new ObjectInputStream(socket.getInputStream());
+                    }
+                    catch (Exception exception){
+                        System.out.println(">>>Ping Timeout Disconnect");
+                        noPingTimeout ++;
+
+                        pinPong = new DataPackages().new PinPong(false);
+                        ObjectFlushClient(pinPong);
+
+                        if(noPingTimeout == 3){
+                            System.out.println("Disconnect");
+                            Disconnect();
+                            break;
+                        }
+
+                        continue;
+                    }
+
+                    noPingTimeout = 0;
+
+                    var packet = objectInputStream.readObject();
+
+                    if(packet.getClass() == DataPackages.PinPong.class){
+                        var packetPingPong = (DataPackages.PinPong)(packet);
+
+                        if(packetPingPong.Ping){
+                            System.out.println("Ping");
+                            Thread.sleep(5000);
+                            pinPong = new DataPackages().new PinPong(false);
+                            ObjectFlushClient(pinPong);
+
+                        }
+                    }
+
+
+                }
+
+
+            } catch (Exception e) {
+                System.out.println("###Pong" +e);
+            }
+        }
+
+        private void ObjectFlushClient(Object object){
+
+            try{
+                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                objectOutputStream.writeObject(object);
+                objectOutputStream.flush();
+            }
+            catch (Exception exception){
+                System.out.println(">>>Error Flush: "+exception.getMessage());
+            }
+
+
+        }
+
+        public void Disconnect(){
+            canRun = false;
+            connectedSocketsThread.Disconnect(true);
+
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+        }
+
+
+
+
 
     }
 

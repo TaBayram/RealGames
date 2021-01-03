@@ -239,9 +239,18 @@ public class DataPackages implements java.io.Serializable{
 
 
     public class PinPong implements  java.io.Serializable{
+        boolean FirstPing = false;
         boolean Ping = false;
         boolean Pong = false;
 
+        PinPong(boolean isPing){
+            if(isPing){
+                Ping = true;
+            }
+            else{
+                Pong = true;
+            }
+        }
 
     }
 

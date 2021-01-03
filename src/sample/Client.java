@@ -11,16 +11,18 @@ public class Client {
     MainClient mainClientThread = new MainClient(null);
     private boolean mainClientThreadCanRun = false;
 
+    PingPong pingPong;
+
+
+
     public static String serverName = "";
     public static DataPackages.Player playerMe = new DataPackages().new Player();
-
 
 
     Client(Controller controller){
         this.controller = controller;
 
     }
-
 
     public void StartMainClient(InetAddress inetAddress){
         mainClientThreadCanRun = true;
@@ -43,7 +45,6 @@ public class Client {
 
     }
 
-
     public class MainClient extends Thread{
         public InetAddress inetAddress;
         public Socket socket;
@@ -65,6 +66,8 @@ public class Client {
                 playerMe.setJoining(true);
                 ObjectFlush(playerMe);
                 playerMe.setJoining(false);
+
+                StartPingPong(inetAddress);
 
 
                 while (mainClientThreadCanRun) {
@@ -169,6 +172,7 @@ public class Client {
             gameCommand.setEntering(true);
             ObjectFlush(gameCommand);
         }
+
         public void ExitGame(){
             DataPackages.GameCommand gameCommand = new DataPackages().new GameCommand();
             gameCommand.setExiting(true);
@@ -231,6 +235,125 @@ public class Client {
 
 
         }
+
+    }
+
+
+
+
+    /*------------------- PING PONG -------------------*/
+
+    public void StartPingPong(InetAddress inetAddress){
+        pingPong = new PingPong(inetAddress);
+        pingPong.start();
+
+
+    }
+
+    public void StopPingPong(){
+
+    }
+
+    class PingPong extends  Thread{
+
+        boolean canRun = true;
+        Socket socket;
+        ObjectOutputStream objectOutputStream;
+        ObjectInputStream objectInputStream;
+        InetAddress inetAddress;
+        int noPongTimeout = 0;
+
+        PingPong(InetAddress inetAddress){
+           this.inetAddress = inetAddress;
+
+        }
+
+        @Override
+        public void run() {
+
+
+            try {
+
+                socket = new Socket(inetAddress, 6666);
+                socket.setSoTimeout(8000);
+
+                DataPackages.PinPong pinPong = new DataPackages().new PinPong(true);
+                pinPong.FirstPing = true;
+                ObjectFlushServer(pinPong);
+
+
+                while(canRun){
+
+                    try{
+                        objectInputStream = new ObjectInputStream(socket.getInputStream());
+                    }
+                    catch (Exception exception){
+                        System.out.println(">>>Pong Timeout Disconnect");
+                        noPongTimeout ++;
+
+                        pinPong = new DataPackages().new PinPong(true);
+                        ObjectFlushServer(pinPong);
+
+                        if(noPongTimeout == 3){
+                            System.out.println("Disconnect");
+                            Disconnect();
+                            break;
+                        }
+
+                        continue;
+                    }
+
+                    noPongTimeout = 0;
+
+                    var packet = objectInputStream.readObject();
+
+                    if(packet.getClass() == DataPackages.PinPong.class){
+                        var packetPingPong = (DataPackages.PinPong)(packet);
+
+                        if(packetPingPong.Pong){
+                            System.out.println("Pong");
+                            Thread.sleep(5000);
+                            pinPong = new DataPackages().new PinPong(true);
+                            ObjectFlushServer(pinPong);
+
+                        }
+                    }
+
+
+                }
+
+
+            } catch (Exception e) {
+                System.out.println(">>>PING " +e);
+            }
+        }
+
+        private void ObjectFlushServer(Object object){
+
+            try{
+                objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                objectOutputStream.writeObject(object);
+                objectOutputStream.flush();
+            }
+            catch (Exception exception){
+                System.out.println(">>>Error Flush: "+exception.getMessage());
+            }
+
+
+        }
+
+        public void Disconnect(){
+            canRun = false;
+            StopMainClient();
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+        }
+
 
     }
 
