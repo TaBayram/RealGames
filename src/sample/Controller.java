@@ -1,5 +1,6 @@
 package sample;
 
+import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,6 +12,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.net.InetAddress;
 import java.util.*;
@@ -78,6 +80,7 @@ public class Controller {
         dialog.setHeaderText(null);
         dialog.setContentText("Please enter your name:");
 
+
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()){
             if(result.get().trim() == ""){
@@ -86,6 +89,7 @@ public class Controller {
             else{
                 Client.playerMe.setName(result.get());
             }
+
             StartServer();
             isServerOwner = true;
             HideOtherMainsExceptThis(anchorPane_Room);
@@ -516,7 +520,10 @@ public class Controller {
         });
     }
 
-
+    public void buttonQuitApp(ActionEvent actionEvent) {
+        Stage stage = (Stage) anchorPane_MainMenu.getScene().getWindow();
+        stage.close();
+    }
 
 
     private class GamePlayerScoreBox{
@@ -581,11 +588,6 @@ public class Controller {
 
     }
 
-
-
-
-
-
     private class RoomPlayerBox{
 
 
@@ -623,7 +625,7 @@ public class Controller {
 
     public void StartSearchingServers(){
         client.StartFindingServers();
-        client.StartReceivingInet(this);
+        client.StartReceivingInet();
     }
 
     public void StopSearchingServers(){

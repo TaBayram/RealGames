@@ -1,9 +1,17 @@
 package sample;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DataPackages implements java.io.Serializable{
+
+    public class Server implements  java.io.Serializable{
+        private InetAddress inetAddress;
+        private String name;
+        private PlayerList playerList;
+
+    }
 
     public class Player implements java.io.Serializable{
         private int ID;
@@ -18,12 +26,7 @@ public class DataPackages implements java.io.Serializable{
         private boolean hasSentAnswer = false;
 
 
-        Player(String name){
-            this.name = name;
-        }
-        Player(){
-
-        }
+        Player(){       }
 
         public String getName() {
             return name;
@@ -103,11 +106,6 @@ public class DataPackages implements java.io.Serializable{
             this.players = players;
         }
 
-
-    }
-
-
-    public class Message{
 
     }
 
@@ -236,7 +234,6 @@ public class DataPackages implements java.io.Serializable{
             this.level = level;
         }
     }
-
 
     public class PinPong implements  java.io.Serializable{
         boolean FirstPing = false;

@@ -6,6 +6,7 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,21 +15,20 @@ public class Server {
     Controller controller;
 
     MainServer mainServerThread = new MainServer();
-    private boolean mainServerThreadCanRun = false;
+    DiscoveryThread discoveryThread = new DiscoveryThread();
 
     public static String ServerName = "Room";
     public static InetAddress serverAddress;
 
-    final static List<ConnectedSocketsThread> clients = new ArrayList<>();
-    final static List<PingPong> pingPongs = new ArrayList<>();
+    final static Vector<ConnectedSocketsThread> clients = new Vector<>();
+    final static Vector<PingPong> pingPongs = new Vector<>();
 
     private ConcurrentMath concurrentMath = new ConcurrentMath();
-
+    Random random = new Random();
 
 
     Server(Controller controller){
         this.controller = controller;
-
     }
 
 
@@ -39,28 +39,25 @@ public class Server {
     public void StartMainServer(){
         clients.clear();
         concurrentMath = new ConcurrentMath();
-        mainServerThreadCanRun = true;
+        mainServerThread.canRun = true;
         if(!mainServerThread.isAlive()){
             mainServerThread = new MainServer();
             mainServerThread.start();
         }
         else{
-
+            return;
         }
     }
 
-    public void StopDiscoveryThread(){
-        if(DiscoveryThread.datagramSocket != null)
-            DiscoveryThread.datagramSocket.close();
-    }
-
     public void StopMainServer() {
-        mainServerThreadCanRun = false;
+        mainServerThread.canRun = false;
         if(mainServerThread == null || !mainServerThread.isAlive()) return;
         try{
             for(ConnectedSocketsThread socketsThread: clients){
                 socketsThread.Disconnect(false);
             }
+
+            pingPongs.clear();
         }
         catch(Exception exception){
             exception.printStackTrace();
@@ -79,6 +76,7 @@ public class Server {
     }
 
     public class MainServer extends Thread{
+        boolean canRun = true;
         ServerSocket serverSocket;
         ObjectInputStream objectInputStream;
         ObjectOutputStream objectOutputStream;
@@ -87,15 +85,14 @@ public class Server {
         @Override
         public void run() {
             try{
-                discoveryThread = new Thread(DiscoveryThread.getInstance());
-                discoveryThread.start();
+                StartDiscoveryThread();
 
                 serverSocket = new ServerSocket(6666);
                 serverAddress = serverSocket.getInetAddress();
                 controller.StartClient(serverAddress);
                 Socket socket = new Socket();
 
-                while (mainServerThreadCanRun) {
+                while (canRun) {
                     try{
                         socket = serverSocket.accept();
                     }
@@ -225,6 +222,7 @@ public class Server {
 
             }
 
+
             clients.remove(LeavingSocketThread);
 
         }
@@ -232,8 +230,6 @@ public class Server {
 
 
 
-
-    Random random = new Random();
 
 
     public class ConnectedSocketsThread extends Thread{
@@ -340,7 +336,6 @@ public class Server {
             try {
                 if(socket.isClosed()) return;
                 canRun = false;
-
                 player.setLeaving(true);
 
                 if(announce) mainServerThread.SendLeavingPlayerPacket(this);
@@ -351,7 +346,15 @@ public class Server {
                     objectInputStream.close();
                 if (objectOutputStream != null)
                     objectOutputStream.close();
+
                 socket.close();
+
+                for (PingPong pingPong:pingPongs) {
+                    if(pingPong.connectedSocketsThread == this){
+                        pingPong.Disconnect();
+                    }
+                }
+
             }
             catch (Exception e){
                 System.out.println("##>Error "+ e.getMessage());
@@ -428,7 +431,7 @@ public class Server {
 
     /*------------------- PING PONG -------------------*/
 
-    class PingPong extends  Thread{
+    class PingPong extends Thread{
 
         boolean canRun = true;
         ConnectedSocketsThread connectedSocketsThread;
@@ -445,29 +448,30 @@ public class Server {
 
         @Override
         public void run() {
-
-
             try {
-                socket.setSoTimeout(8000);
+                socket.setSoTimeout(4000);
 
                 var pinPong = new DataPackages().new PinPong(false);
                 ObjectFlushClient(pinPong);
 
-
                 while(canRun){
-
                     try{
                         objectInputStream = new ObjectInputStream(socket.getInputStream());
                     }
                     catch (Exception exception){
-                        System.out.println(">>>Ping Timeout Disconnect");
+                        System.out.println("###Ping Timeout Disconnect");
+                        if(socket.isClosed()) {
+                            Disconnect();
+                            return;
+                        }
+
                         noPingTimeout ++;
 
                         pinPong = new DataPackages().new PinPong(false);
                         ObjectFlushClient(pinPong);
 
                         if(noPingTimeout == 3){
-                            System.out.println("Disconnect");
+                            System.out.println("#Disconnect");
                             Disconnect();
                             break;
                         }
@@ -483,8 +487,8 @@ public class Server {
                         var packetPingPong = (DataPackages.PinPong)(packet);
 
                         if(packetPingPong.Ping){
-                            System.out.println("Ping");
-                            Thread.sleep(5000);
+                            System.out.println("#Ping");
+                            Thread.sleep(2000);
                             pinPong = new DataPackages().new PinPong(false);
                             ObjectFlushClient(pinPong);
 
@@ -501,25 +505,25 @@ public class Server {
         }
 
         private void ObjectFlushClient(Object object){
-
             try{
                 objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
                 objectOutputStream.writeObject(object);
                 objectOutputStream.flush();
             }
             catch (Exception exception){
-                System.out.println(">>>Error Flush: "+exception.getMessage());
+                System.out.println("###Error Pong Flush "+exception.getMessage());
             }
 
 
         }
 
-        public void Disconnect(){
-            canRun = false;
-            connectedSocketsThread.Disconnect(true);
-
+        public synchronized void Disconnect(){
             try {
+                if(this.socket.isClosed()) return;
+                canRun = false;
                 socket.close();
+                connectedSocketsThread.Disconnect(true);
+                pingPongs.remove(this);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -534,11 +538,27 @@ public class Server {
     }
 
 
-
-
-
     /* --------------------- DISCOVER ME --------------------- */
-    public static class DiscoveryThread implements Runnable {
+
+    public void StartDiscoveryThread(){
+        discoveryThread.canRun = true;
+        if(!discoveryThread.isAlive()){
+            discoveryThread = new DiscoveryThread();
+            discoveryThread.start();
+        }
+        else{
+            return;
+        }
+    }
+
+    public void StopDiscoveryThread(){
+        if(DiscoveryThread.datagramSocket != null)
+            DiscoveryThread.datagramSocket.close();
+    }
+
+
+    public static class DiscoveryThread extends Thread {
+        public boolean canRun = true;
         public static DatagramSocket datagramSocket;
 
         @Override
@@ -548,7 +568,7 @@ public class Server {
                 datagramSocket = new DatagramSocket(6666, InetAddress.getByName("0.0.0.0"));
                 datagramSocket.setBroadcast(true);
 
-                while (true) {
+                while (canRun) {
                     System.out.println(getClass().getName() + "###Ready to receive broadcast packets!");
 
                     //Receive a packet
@@ -583,16 +603,6 @@ public class Server {
                 Logger.getLogger(DiscoveryThread.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-
-        public static DiscoveryThread getInstance() {
-            return DiscoveryThreadHolder.INSTANCE;
-        }
-
-        private static class DiscoveryThreadHolder {
-
-            private static final DiscoveryThread INSTANCE = new DiscoveryThread();
-        }
-
 
 
     }

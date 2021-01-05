@@ -46,68 +46,6 @@ public class ConcurrentMath {
 
         }
 
-/*
-        ArrayList<String> equation = new ArrayList();
-        for(int i = 0; i < numbers.size(); i++){
-            if(i == 0){
-                equation.add(""+numbers.get(i));
-                continue;
-            }
-            int operation = random.nextInt(3);
-
-            if(operation == 0){
-                equation.add("+");
-                equation.add(""+numbers.get(i));
-            }
-            else if(operation == 1){
-                equation.add("-");
-                equation.add(""+numbers.get(i));
-            }
-            else if(operation == 2){
-                equation.add("x");
-                equation.add(""+numbers.get(i));
-            }
-
-
-
-        }
-
-        for(String str: equation){
-            question+= str;
-        }
-
-        int smallResult = 0;
-        for(int i = 0; i < equation.size(); i++){
-            if(equation.get(i) == "x"){
-                smallResult = Integer.parseInt(equation.get(i-1)) * Integer.parseInt(equation.get(i+1));
-                equation.remove(i-1);
-                equation.remove(i-1);
-                equation.set(i-1,smallResult+"");
-
-            }
-
-        }
-        for(int i = 0; i < equation.size(); i++){
-            if(equation.get(i) == "+"){
-                smallResult = Integer.parseInt(equation.get(i-1)) + Integer.parseInt(equation.get(i+1));
-                equation.remove(i-1);
-                equation.remove(i-1);
-                equation.set(i-1,smallResult+"");
-
-            }
-            else if(equation.get(i) == "-"){
-                smallResult = Integer.parseInt(equation.get(i-1)) - Integer.parseInt(equation.get(i+1));
-                equation.remove(i-1);
-                equation.remove(i-1);
-                equation.set(i-1,smallResult+"");
-
-            }
-
-        }
-        result = Integer.parseInt(equation.get(0));
-*/
-
-
         answer = result;
         this.question = question;
         levelScore = level*2;

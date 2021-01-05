@@ -8,30 +8,25 @@ public class Client {
 
     static Controller controller;
 
+    static String serverName = "";
+    static DataPackages.Player playerMe = new DataPackages().new Player();
+
     MainClient mainClientThread = new MainClient(null);
-    private boolean mainClientThreadCanRun = false;
-
-    PingPong pingPong;
-
-
-
-    public static String serverName = "";
-    public static DataPackages.Player playerMe = new DataPackages().new Player();
-
+    PingPong pingPongThread;
 
     Client(Controller controller){
-        this.controller = controller;
-
+        Client.controller = controller;
     }
 
+
     public void StartMainClient(InetAddress inetAddress){
-        mainClientThreadCanRun = true;
+        mainClientThread.canRun = true;
         if(!mainClientThread.isAlive()){
             mainClientThread = new MainClient(inetAddress);
             mainClientThread.start();
         }
         else{
-
+            return;
         }
 
 
@@ -39,13 +34,15 @@ public class Client {
 
     public void StopMainClient() {
         if(mainClientThread == null || !mainClientThread.isAlive()) return;
-        mainClientThreadCanRun = false;
+        mainClientThread.canRun = false;
         mainClientThread.LeaveRoom();
+
 
 
     }
 
     public class MainClient extends Thread{
+        public boolean canRun = true;
         public InetAddress inetAddress;
         public Socket socket;
         public ObjectOutputStream objectOutputStream;
@@ -70,9 +67,10 @@ public class Client {
                 StartPingPong(inetAddress);
 
 
-                while (mainClientThreadCanRun) {
+                while (canRun) {
                     objectInputStream = new ObjectInputStream(socket.getInputStream());
                     var packet = objectInputStream.readObject();
+
 
                     if(packet.getClass() == DataPackages.Player.class){
                         var packetPlayer = (DataPackages.Player)(packet);
@@ -90,8 +88,7 @@ public class Client {
 
                             if(packetPlayer.getID() == playerMe.getID()){
                                 System.out.println(">>> Getting Kicked");
-                                controller.ShowPlayBecauseYouGotKicked();
-                                socket.close();
+                                Disconnect();
                                 break;
                             }
                             else{
@@ -100,6 +97,7 @@ public class Client {
 
                             }
                         }
+
                         else if(packetPlayer.isChecking()){
                             playerMe.setID(packetPlayer.getID());
                             controller.AddPlayerToList(playerMe,true);
@@ -115,6 +113,7 @@ public class Client {
                         }
 
                     }
+
                     //YOU HAVE JOINED THE ROOM AND GETTING THE PLAYER LIST
                     else if(packet.getClass() == DataPackages.PlayerList.class){
                         var packetPlayer = (DataPackages.PlayerList)(packet);
@@ -162,8 +161,15 @@ public class Client {
 
                 }
 
-            } catch (Exception e) {
+            }
+            catch (InterruptedIOException  e){
+                System.out.println(">>>Interrupted "+e);
+                Disconnect();
+            }
+            catch (Exception e) {
                 System.out.println(">>>Error " +e);
+
+
             }
         }
 
@@ -192,7 +198,6 @@ public class Client {
 
         }
 
-
         public void SendAnswer(DataPackages.MathQuestion mathQuestion){
             try{
 
@@ -210,11 +215,12 @@ public class Client {
 
         public void LeaveRoom(){
             try{
+                if(this.socket.isClosed()) return;
 
                 playerMe.setLeaving(true);
                 ObjectFlush(playerMe);
                 playerMe.setLeaving(false);
-
+                mainClientThread.interrupt();
             }
             catch (Exception exception){
                 System.out.println(">>>Error Leaving: "+exception.getMessage());
@@ -222,8 +228,21 @@ public class Client {
 
         }
 
-        private void ObjectFlush(Object object){
+        public synchronized void Disconnect(){
+            try {
+                if(this.socket.isClosed()) return;
 
+                socket.close();
+                controller.ShowPlayBecauseYouGotKicked();
+                StopPingPong();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+        }
+
+        private void ObjectFlush(Object object){
             try{
                 objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
                 objectOutputStream.writeObject(object);
@@ -244,14 +263,16 @@ public class Client {
     /*------------------- PING PONG -------------------*/
 
     public void StartPingPong(InetAddress inetAddress){
-        pingPong = new PingPong(inetAddress);
-        pingPong.start();
+        pingPongThread = new PingPong(inetAddress);
+        pingPongThread.start();
 
 
     }
 
     public void StopPingPong(){
-
+        if(pingPongThread == null || !pingPongThread.isAlive()) return;
+        pingPongThread.Disconnect();
+        pingPongThread.canRun = false;
     }
 
     class PingPong extends  Thread{
@@ -270,12 +291,9 @@ public class Client {
 
         @Override
         public void run() {
-
-
             try {
-
                 socket = new Socket(inetAddress, 6666);
-                socket.setSoTimeout(8000);
+                socket.setSoTimeout(4000);
 
                 DataPackages.PinPong pinPong = new DataPackages().new PinPong(true);
                 pinPong.FirstPing = true;
@@ -283,19 +301,23 @@ public class Client {
 
 
                 while(canRun){
-
                     try{
                         objectInputStream = new ObjectInputStream(socket.getInputStream());
                     }
                     catch (Exception exception){
                         System.out.println(">>>Pong Timeout Disconnect");
+                        if(socket.isClosed()){
+                            Disconnect();
+                            return;
+                        }
+
                         noPongTimeout ++;
 
                         pinPong = new DataPackages().new PinPong(true);
                         ObjectFlushServer(pinPong);
 
                         if(noPongTimeout == 3){
-                            System.out.println("Disconnect");
+                            System.out.println(">Disconnect");
                             Disconnect();
                             break;
                         }
@@ -311,8 +333,8 @@ public class Client {
                         var packetPingPong = (DataPackages.PinPong)(packet);
 
                         if(packetPingPong.Pong){
-                            System.out.println("Pong");
-                            Thread.sleep(5000);
+                            System.out.println(">Pong");
+                            Thread.sleep(2000);
                             pinPong = new DataPackages().new PinPong(true);
                             ObjectFlushServer(pinPong);
 
@@ -336,22 +358,22 @@ public class Client {
                 objectOutputStream.flush();
             }
             catch (Exception exception){
-                System.out.println(">>>Error Flush: "+exception.getMessage());
+                System.out.println(">>>Error Ping Flush: "+exception.getMessage());
             }
 
 
         }
 
-        public void Disconnect(){
-            canRun = false;
-            StopMainClient();
+        public synchronized void Disconnect(){
             try {
+                if(this.socket.isClosed()) return;
+                canRun = false;
                 socket.close();
+                StopMainClient();
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
         }
 
 
@@ -377,7 +399,7 @@ public class Client {
 
     }
 
-    public void StopFindingServers() throws InterruptedException {
+    public void StopFindingServers() {
         findServersThreadCanRun = false;
 
     }
@@ -483,7 +505,8 @@ public class Client {
     private Thread receiverThread = new Thread();
     private boolean receiverThreadCanRun = false;
 
-    public void StartReceivingInet(Controller controller){
+
+    public void StartReceivingInet(){
         receiverThreadCanRun = true;
         if(!receiverThread.isAlive()){
             Receiver receiver = new Receiver(controller);
@@ -497,7 +520,7 @@ public class Client {
 
     }
 
-    public void StopReceivingInet() throws InterruptedException {
+    public void StopReceivingInet() {
         receiverThreadCanRun = false;
         Sender sender = new Sender(null);
         Thread thread = new Thread(sender);
