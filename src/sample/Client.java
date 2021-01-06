@@ -77,7 +77,7 @@ public class Client {
 
                         //A PLAYER HAS JOINED THE ROOM
                         if(packetPlayer.isJoining()){
-                            System.out.println(">>> Player has joined! " +packetPlayer.getName());
+                            //System.out.println(">>> Player has joined! " +packetPlayer.getName());
                             controller.AddPlayerToList(packetPlayer,true);
 
                             //Add Newcomer
@@ -87,13 +87,13 @@ public class Client {
                         else if(packetPlayer.isLeaving()){
 
                             if(packetPlayer.getID() == playerMe.getID()){
-                                System.out.println(">>> Getting Kicked");
+                                //System.out.println(">>> Getting Kicked");
                                 Disconnect();
                                 break;
                             }
                             else{
                                 controller.RemovePlayerFromList(packetPlayer);
-                                System.out.println(">>> Player has left!" + packetPlayer.getName());
+                                //System.out.println(">>> Player has left!" + packetPlayer.getName());
 
                             }
                         }
@@ -141,7 +141,7 @@ public class Client {
                             controller.EndCurrentLevel();
                         }
                         else if(packetGameCommand.isEnding()){
-                            controller.EndCurrentLevel();
+                            controller.EndGameShowWinner();
                         }
 
                     }
@@ -163,11 +163,11 @@ public class Client {
 
             }
             catch (InterruptedIOException  e){
-                System.out.println(">>>Interrupted "+e);
+                //System.out.println(">>>Interrupted "+e);
                 Disconnect();
             }
             catch (Exception e) {
-                System.out.println(">>>Error " +e);
+                //System.out.println(">>>Error " +e);
 
 
             }
@@ -190,6 +190,11 @@ public class Client {
             gameCommand.setStarting(true);
             ObjectFlush(gameCommand);
         }
+        public void StopGame(){
+            DataPackages.GameCommand gameCommand = new DataPackages().new GameCommand();
+            gameCommand.setEnding(true);
+            ObjectFlush(gameCommand);
+        }
 
         public void NextLevel(){
             DataPackages.GameCommand gameCommand = new DataPackages().new GameCommand();
@@ -207,7 +212,7 @@ public class Client {
 
             }
             catch (Exception exception){
-                System.out.println(">>>Error Answer: "+exception.getMessage());
+                //System.out.println(">>>Error Answer: "+exception.getMessage());
             }
 
 
@@ -223,7 +228,7 @@ public class Client {
                 mainClientThread.interrupt();
             }
             catch (Exception exception){
-                System.out.println(">>>Error Leaving: "+exception.getMessage());
+                //System.out.println(">>>Error Leaving: "+exception.getMessage());
             }
 
         }
@@ -249,7 +254,7 @@ public class Client {
                 objectOutputStream.flush();
             }
             catch (Exception exception){
-                System.out.println(">>>Error Flush: "+exception.getMessage());
+                //System.out.println(">>>Error Flush: "+exception.getMessage());
             }
 
 
@@ -305,7 +310,7 @@ public class Client {
                         objectInputStream = new ObjectInputStream(socket.getInputStream());
                     }
                     catch (Exception exception){
-                        System.out.println(">>>Pong Timeout Disconnect");
+                        //System.out.println(">>>Pong Timeout Disconnect");
                         if(socket.isClosed()){
                             Disconnect();
                             return;
@@ -317,7 +322,7 @@ public class Client {
                         ObjectFlushServer(pinPong);
 
                         if(noPongTimeout == 3){
-                            System.out.println(">Disconnect");
+                            //System.out.println(">Disconnect");
                             Disconnect();
                             break;
                         }
@@ -333,7 +338,7 @@ public class Client {
                         var packetPingPong = (DataPackages.PinPong)(packet);
 
                         if(packetPingPong.Pong){
-                            System.out.println(">Pong");
+                            //System.out.println(">Pong");
                             Thread.sleep(2000);
                             pinPong = new DataPackages().new PinPong(true);
                             ObjectFlushServer(pinPong);
@@ -346,7 +351,7 @@ public class Client {
 
 
             } catch (Exception e) {
-                System.out.println(">>>PING " +e);
+                //System.out.println(">>>PING " +e);
             }
         }
 
@@ -358,7 +363,7 @@ public class Client {
                 objectOutputStream.flush();
             }
             catch (Exception exception){
-                System.out.println(">>>Error Ping Flush: "+exception.getMessage());
+                //System.out.println(">>>Error Ping Flush: "+exception.getMessage());
             }
 
 
@@ -420,7 +425,7 @@ public class Client {
                     try {
                         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, InetAddress.getByName("255.255.255.255"), 8888);
                         datagramSocket.send(sendPacket);
-                        System.out.println(Client.class.getName() + ">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
+                        //System.out.println(Client.class.getName() + ">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
                     } catch (Exception e) {
                     }
 
@@ -446,15 +451,15 @@ public class Client {
                             } catch (Exception e) {
                             }
 
-                            System.out.println(Client.class.getName() + ">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
+                            //System.out.println(Client.class.getName() + ">>> Request packet sent to: " + broadcast.getHostAddress() + "; Interface: " + networkInterface.getDisplayName());
                         }
                     }
 
-                    System.out.println(Client.class.getName() + ">>> Done looping over all network interfaces. Now waiting for a reply!");
+                    //System.out.println(Client.class.getName() + ">>> Done looping over all network interfaces. Now waiting for a reply!");
                     long startTime = System.currentTimeMillis();
-                    System.out.println(">>>Outside time" + (System.currentTimeMillis() - startTime));
+                    //System.out.println(">>>Outside time" + (System.currentTimeMillis() - startTime));
                     while ((System.currentTimeMillis() - startTime) < 8000 && findServersThreadCanRun) {
-                        System.out.println(">>>Inside time" + (System.currentTimeMillis() - startTime));
+                        //System.out.println(">>>Inside time" + (System.currentTimeMillis() - startTime));
 
                         try {
 
@@ -466,14 +471,14 @@ public class Client {
                             datagramSocket.receive(receivePacket);
 
                             //We have a response
-                            System.out.println(Client.class.getName() + ">>> Broadcast response from server: " + receivePacket.getAddress().getHostAddress());
+                            //System.out.println(Client.class.getName() + ">>> Broadcast response from server: " + receivePacket.getAddress().getHostAddress());
 
                             //Check if the message is correct
                             String[] fullMessage = new String(receivePacket.getData()).split(" ");
                             String message = fullMessage[0];
                             if (message.equals("DISCOVER_FUIFSERVER_RESPONSE")) {
                                 //DO SOMETHING WITH THE SERVER'S IP (for example, store it in your controller)
-                                System.out.println((">>>Server Address") + receivePacket.getAddress());
+                                //System.out.println((">>>Server Address") + receivePacket.getAddress());
                                 serverName = fullMessage[1];
                                 Sender sender = new Sender(receivePacket.getAddress());
                                 Thread thread = new Thread(sender);
@@ -482,7 +487,7 @@ public class Client {
                             }
                         }
                         catch (SocketTimeoutException socketTimeoutException ){
-                            System.out.println(">>>Timeout No Response");
+                            //System.out.println(">>>Timeout No Response");
                         }
                     }
 
@@ -490,7 +495,7 @@ public class Client {
                     //Close the port!
                     datagramSocket.close();
                 } catch (IOException ex) {
-                    System.out.println(ex.getMessage());
+                    //System.out.println(ex.getMessage());
 
                 }
             };

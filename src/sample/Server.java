@@ -97,7 +97,7 @@ public class Server {
                         socket = serverSocket.accept();
                     }
                     catch(SocketException socketException){
-                        System.out.println("###Server Closed");
+                        //System.out.println("###Server Closed");
                         StopDiscoveryThread();
                         break;
                     }
@@ -121,7 +121,7 @@ public class Server {
                                 }
                             }
 
-                            System.out.println("First Ping");
+                            //System.out.println("First Ping");
                             PingPong pingPong = new PingPong(connectedSocketsThread,socket);
                             pingPong.start();
                             pingPongs.add(pingPong);
@@ -159,12 +159,12 @@ public class Server {
                                 packetPlayer.setJoining(true);
                             }
                             catch (Exception exception){
-                                System.out.println("###Error in ID: " + exception);
+                                //System.out.println("###Error in ID: " + exception);
                             }
 
 
                             var clientName = packetPlayer.getName();
-                            System.out.println("### Player has joined! " +clientName);
+                            //System.out.println("### Player has joined! " +clientName);
 
                             DataPackages.PlayerList playerList = new DataPackages().new PlayerList();
                             for (ConnectedSocketsThread connectedSocketsThread: clients) {
@@ -201,7 +201,7 @@ public class Server {
 
             }
             catch(Exception e){
-                System.out.println("###Error " + e);
+                //System.out.println("###Error " + e);
             }
         }
 
@@ -209,7 +209,7 @@ public class Server {
             for (ConnectedSocketsThread connectedSocketsThread: clients) {
                 if(LeavingSocketThread != connectedSocketsThread){
                     try {
-                        System.out.println("Leaver " +LeavingSocketThread.player.getName() +" Sending to " + connectedSocketsThread.player.getName());
+                        //System.out.println("Leaver " +LeavingSocketThread.player.getName() +" Sending to " + connectedSocketsThread.player.getName());
                         objectOutputStream = new ObjectOutputStream(connectedSocketsThread.socket.getOutputStream());
                         objectOutputStream.writeObject(LeavingSocketThread.player);
                         objectOutputStream.flush();
@@ -268,7 +268,7 @@ public class Server {
                         var packetMathQuestion = (DataPackages.MathQuestion) (packet);
 
                         if(packetMathQuestion.isSendingAnswer()){
-                            System.out.println("##>Answer from: " +player.getName() + " - "+ packetMathQuestion.getAnswer());
+                            //System.out.println("##>Answer from: " +player.getName() + " - "+ packetMathQuestion.getAnswer());
 
                             player.setScore(player.getScore() + (int)Math.round(packetMathQuestion.getPoint()));
 
@@ -318,14 +318,15 @@ public class Server {
                             nextQuestion();
                         }
                         else if(packetGameCommand.isEnding()){
-                            ObjectFlushAll(packetGameCommand);
+                            ObjectFlushOthers(packetGameCommand);
                         }
+
                     }
 
 
                 }
                 catch(Exception exception){
-                    System.out.println("##>Error: "+exception.getMessage());
+                    //System.out.println("##>Error: "+exception.getMessage());
                 }
 
             }
@@ -357,7 +358,7 @@ public class Server {
 
             }
             catch (Exception e){
-                System.out.println("##>Error "+ e.getMessage());
+                //System.out.println("##>Error "+ e.getMessage());
             }
         }
 
@@ -381,7 +382,7 @@ public class Server {
                 objectOutputStream.flush();
             }
             catch (Exception exception){
-                System.out.println(">>>Error Flush: "+exception.getMessage());
+                //System.out.println(">>>Error Flush: "+exception.getMessage());
             }
 
 
@@ -403,7 +404,7 @@ public class Server {
 
             }
             catch (Exception exception){
-                System.out.println(">>>Error Flush: "+exception.getMessage());
+                //System.out.println(">>>Error Flush: "+exception.getMessage());
             }
 
 
@@ -421,7 +422,7 @@ public class Server {
                 }
             }
             catch (Exception exception){
-                System.out.println(">>>Error Flush: "+exception.getMessage());
+                //System.out.println(">>>Error Flush: "+exception.getMessage());
             }
 
 
@@ -459,7 +460,7 @@ public class Server {
                         objectInputStream = new ObjectInputStream(socket.getInputStream());
                     }
                     catch (Exception exception){
-                        System.out.println("###Ping Timeout Disconnect");
+                        //System.out.println("###Ping Timeout Disconnect");
                         if(socket.isClosed()) {
                             Disconnect();
                             return;
@@ -471,7 +472,7 @@ public class Server {
                         ObjectFlushClient(pinPong);
 
                         if(noPingTimeout == 3){
-                            System.out.println("#Disconnect");
+                            //System.out.println("#Disconnect");
                             Disconnect();
                             break;
                         }
@@ -487,7 +488,7 @@ public class Server {
                         var packetPingPong = (DataPackages.PinPong)(packet);
 
                         if(packetPingPong.Ping){
-                            System.out.println("#Ping");
+                            //System.out.println("#Ping");
                             Thread.sleep(2000);
                             pinPong = new DataPackages().new PinPong(false);
                             ObjectFlushClient(pinPong);
@@ -500,7 +501,7 @@ public class Server {
 
 
             } catch (Exception e) {
-                System.out.println("###Pong" +e);
+                //System.out.println("###Pong" +e);
             }
         }
 
@@ -511,7 +512,7 @@ public class Server {
                 objectOutputStream.flush();
             }
             catch (Exception exception){
-                System.out.println("###Error Pong Flush "+exception.getMessage());
+                //System.out.println("###Error Pong Flush "+exception.getMessage());
             }
 
 
@@ -569,7 +570,7 @@ public class Server {
                 datagramSocket.setBroadcast(true);
 
                 while (canRun) {
-                    System.out.println(getClass().getName() + "###Ready to receive broadcast packets!");
+                    //System.out.println(getClass().getName() + "###Ready to receive broadcast packets!");
 
                     //Receive a packet
                     byte[] receiveBuf = new byte[15000];
@@ -578,14 +579,14 @@ public class Server {
                         datagramSocket.receive(packet);
                     }
                     catch(Exception exception){
-                        System.out.println(getClass().getName() + "###Discovery Stop:" );
+                        //System.out.println(getClass().getName() + "###Discovery Stop:" );
                         break;
                     }
 
 
                     //Packet received
-                    System.out.println(getClass().getName() + "###Discovery packet received from: " + packet.getAddress().getHostAddress());
-                    System.out.println(getClass().getName() + "###Packet received; data: " + new String(packet.getData()));
+                    //System.out.println(getClass().getName() + "###Discovery packet received from: " + packet.getAddress().getHostAddress());
+                    //System.out.println(getClass().getName() + "###Packet received; data: " + new String(packet.getData()));
 
                     //See if the packet holds the right command (message)
                     String message = new String(packet.getData()).trim();
@@ -596,7 +597,7 @@ public class Server {
                         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, packet.getAddress(), packet.getPort());
                         datagramSocket.send(sendPacket);
 
-                        System.out.println(getClass().getName() + "###Sent packet to: " + sendPacket.getAddress().getHostAddress());
+                        //System.out.println(getClass().getName() + "###Sent packet to: " + sendPacket.getAddress().getHostAddress());
                     }
                 }
             } catch (IOException ex) {

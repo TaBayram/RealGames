@@ -306,7 +306,7 @@ public class Controller {
             }
         }
         catch (Exception e){
-            System.out.println("¤¤¤Parse Error: " + e.getMessage());
+            //System.out.println("¤¤¤Parse Error: " + e.getMessage());
         }
 
 
@@ -339,7 +339,7 @@ public class Controller {
 
     public void PrepareForNextLevel(){
         if(gmHasGottenNextQuestion) return;
-        System.out.println("¤¤¤Next Level Preparation");
+        //System.out.println("¤¤¤Next Level Preparation");
 
         Platform.runLater(() -> {
 
@@ -419,6 +419,7 @@ public class Controller {
             if(isServerOwner) {
 
                 if(mathQuestion.getLevel() == 10){
+                    StopGame();
                     EndGameShowWinner();
                 }
                 else
@@ -436,7 +437,7 @@ public class Controller {
 
     public void EndGameShowWinner(){
         FinishGame();
-
+        Platform.runLater(()-> {
         var winnerPlayer = players.get(0);
         for (DataPackages.Player player:players) {
             if (player.getScore() > winnerPlayer.getScore()){
@@ -445,8 +446,8 @@ public class Controller {
 
         }
 
-        label_Question.setText("WINNER: " + winnerPlayer.getName() + "\n\t Score: " + winnerPlayer.getScore());
-
+            label_Question.setText("WINNER: " + winnerPlayer.getName() + "\n\t Score: " + winnerPlayer.getScore());
+        });
 
     }
 
@@ -481,7 +482,7 @@ public class Controller {
     ObservableList<InetAddress> inetAddresses = FXCollections.observableArrayList();
     public ObservableList<String> namelist = FXCollections.observableArrayList();
     public void ReceiveData(InetAddress inetAddress){
-        System.out.println("Received InetAddress");
+        //System.out.println("Received InetAddress");½
         boolean isUnique = true;
         for (InetAddress address: inetAddresses) {
            if(inetAddress == address){
@@ -634,7 +635,7 @@ public class Controller {
             client.StopFindingServers();
             client.StopReceivingInet();
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            //System.out.println(e.getMessage());
         }
 
     }
@@ -673,6 +674,7 @@ public class Controller {
     }
 
     public void StopGame(){
+        client.mainClientThread.StopGame();
 
 
     }
