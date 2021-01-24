@@ -410,6 +410,7 @@ public class Controller {
         gmHasGottenNextQuestion = false;
 
         Platform.runLater(()->{
+            if(!gmHasGottenNextQuestion) return;
             System.out.println(mathQuestion.getLevel() + " Ending");
 
 
