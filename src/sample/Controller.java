@@ -276,6 +276,7 @@ public class Controller {
     boolean gmHasGottenNextQuestion = false;
     boolean gMCountdownFinished = false;
 
+    int questionAnswer = 0;
     int questionCountdown = 8;
     double gameLevelTime = 10;
 
@@ -347,6 +348,7 @@ public class Controller {
             gameLevelTime = 10 + mathQuestion.getLevel()*1.50;
             gmHasGottenNextQuestion = true;
             gMCountdownFinished = false;
+            questionAnswer = (int)mathQuestion.getAnswer()+0;
             TimerTask questionTask = new TimerTask() {
                 @Override
                 public void run() {
@@ -410,11 +412,11 @@ public class Controller {
         gmHasGottenNextQuestion = false;
 
         Platform.runLater(()->{
-            if(!gmHasGottenNextQuestion) return;
+            if(gmHasGottenNextQuestion) return;
             System.out.println(mathQuestion.getLevel() + " Ending");
 
 
-            label_Question.setText("Answer: "+ mathQuestion.getAnswer() );
+            label_Question.setText("Answer: "+ questionAnswer );
             textField_GMAnswer.setEditable(false);
             label_Timer.setText("00:00");
             timer_GameLevelTime.cancel();

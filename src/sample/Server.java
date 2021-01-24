@@ -377,7 +377,7 @@ public class Server {
             mathQuestion.setPoint(concurrentMath.levelScore);
             mathQuestion.setLevel(concurrentMath.level);
             mathQuestion.setSendingQuestion(true);
-            System.out.println(concurrentMath.level +" Level");
+            System.out.println(concurrentMath.level +" Level " + concurrentMath.answer);
             ObjectFlushAll(mathQuestion);
         }
 
