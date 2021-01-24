@@ -1,8 +1,5 @@
 package sample;
 
-
-import sample.Main;
-
 public class FakeMain{
 
     public static void main(String[] args) {

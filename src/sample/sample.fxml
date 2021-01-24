@@ -20,30 +20,6 @@
                   </Label>
                   <AnchorPane minHeight="50.0" prefHeight="149.0" prefWidth="600.0">
                      <children>
-                        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="73.0" pickOnBounds="true" preserveRatio="true" rotate="-25.0" AnchorPane.leftAnchor="60.0">
-                           <image>
-                              <Image url="@assets/abdullah.png" />
-                           </image>
-                           <effect>
-                              <MotionBlur />
-                           </effect>
-                        </ImageView>
-                        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="240.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="240.0" AnchorPane.rightAnchor="240.0">
-                           <image>
-                              <Image url="@assets/tayyib.png" />
-                           </image>
-                           <effect>
-                              <MotionBlur />
-                           </effect>
-                        </ImageView>
-                        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="428.0" pickOnBounds="true" preserveRatio="true" rotate="25.0" AnchorPane.rightAnchor="60.0">
-                           <image>
-                              <Image url="@assets/yusuf.png" />
-                           </image>
-                           <effect>
-                              <MotionBlur />
-                           </effect>
-                        </ImageView>
                      </children>
                   </AnchorPane>
                </children>
@@ -56,7 +32,7 @@
                   <VBox alignment="TOP_CENTER" layoutX="200.0" maxHeight="800.0" maxWidth="600.0" minHeight="150.0" minWidth="150.0" prefHeight="300.0" prefWidth="200.0" spacing="50.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <Button fx:id="button_MMPlay" maxHeight="200.0" maxWidth="600.0" minHeight="25.0" minWidth="100.0" mnemonicParsing="false" onAction="#buttonPlayClick" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Play" />
-                        <Button fx:id="button_MMOptions" maxHeight="200.0" maxWidth="600.0" minHeight="25.0" minWidth="100.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Consept" />
+
                         <Button fx:id="button_MMQuit" maxHeight="200.0" maxWidth="600.0" minHeight="25.0" minWidth="100.0" mnemonicParsing="false" onAction="#buttonQuitApp" prefHeight="50.0" prefWidth="200.0" styleClass="generalbuttons" text="Quit" />
                      </children>
                      <padding>

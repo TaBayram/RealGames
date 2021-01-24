@@ -152,6 +152,7 @@ public class Client {
 
                         //RECEIVING QUESTION AND STARTING THE CLOCK
                         if(packetMathQuestion.isSendingQuestion()){
+                            controller.mathQuestion.setSendingQuestion(false);
                             controller.mathQuestion = packetMathQuestion;
                             controller.PrepareForNextLevel();
                         }

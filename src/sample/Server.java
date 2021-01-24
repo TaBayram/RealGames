@@ -268,7 +268,7 @@ public class Server {
                         var packetMathQuestion = (DataPackages.MathQuestion) (packet);
 
                         if(packetMathQuestion.isSendingAnswer()){
-                            //System.out.println("##>Answer from: " +player.getName() + " - "+ packetMathQuestion.getAnswer());
+                            System.out.println("##>Answer from: " +player.getName() + " - "+ packetMathQuestion.getAnswer());
 
                             player.setScore(player.getScore() + (int)Math.round(packetMathQuestion.getPoint()));
 
@@ -289,6 +289,7 @@ public class Server {
                                 for (ConnectedSocketsThread socketsThread:clients) {
                                     socketsThread.player.setHasSentAnswer(false);
                                 }
+                                System.out.println("Hey");
                                 DataPackages.GameCommand gameCommand = new DataPackages().new GameCommand();
                                 gameCommand.setHasEveryoneSentAnswer(true);
                                 ObjectFlushAll(gameCommand);
@@ -363,6 +364,7 @@ public class Server {
         }
 
         private void nextQuestion(){
+
             concurrentMath.level ++;
             concurrentMath.CreateQuestion();
             DataPackages.MathQuestion mathQuestion = new DataPackages().new MathQuestion();
@@ -371,7 +373,7 @@ public class Server {
             mathQuestion.setPoint(concurrentMath.levelScore);
             mathQuestion.setLevel(concurrentMath.level);
             mathQuestion.setSendingQuestion(true);
-
+            System.out.println(concurrentMath.level +" Level");
             ObjectFlushAll(mathQuestion);
         }
 

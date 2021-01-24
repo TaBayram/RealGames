@@ -406,6 +406,7 @@ public class Controller {
 
     public void EndCurrentLevel(){
         Platform.runLater(()->{
+            System.out.println(mathQuestion.getLevel() + " Ending");
             if(!gmHasGottenNextQuestion) return;
             gMCanAnswer = false;
             gmHasGottenNextQuestion = false;
@@ -413,11 +414,10 @@ public class Controller {
             label_Question.setText("Answer: "+ mathQuestion.getAnswer() );
             textField_GMAnswer.setEditable(false);
             label_Timer.setText("00:00");
-
+            timer_GameLevelTime.cancel();
 
 
             if(isServerOwner) {
-
                 if(mathQuestion.getLevel() == 10){
                     StopGame();
                     EndGameShowWinner();
@@ -427,7 +427,7 @@ public class Controller {
             }
 
 
-            timer_GameLevelTime.cancel();
+
 
 
 
