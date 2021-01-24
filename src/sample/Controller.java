@@ -413,7 +413,7 @@ public class Controller {
 
         Platform.runLater(()->{
             if(gmHasGottenNextQuestion) return;
-            System.out.println(mathQuestion.getLevel() + " Ending");
+           //System.out.println(mathQuestion.getLevel() + " Ending");
 
 
             label_Question.setText("Answer: "+ questionAnswer );
