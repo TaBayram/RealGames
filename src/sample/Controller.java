@@ -405,11 +405,13 @@ public class Controller {
     }
 
     public void EndCurrentLevel(){
+        if(!gmHasGottenNextQuestion) return;
+        gMCanAnswer = false;
+        gmHasGottenNextQuestion = false;
+
         Platform.runLater(()->{
             System.out.println(mathQuestion.getLevel() + " Ending");
-            if(!gmHasGottenNextQuestion) return;
-            gMCanAnswer = false;
-            gmHasGottenNextQuestion = false;
+
 
             label_Question.setText("Answer: "+ mathQuestion.getAnswer() );
             textField_GMAnswer.setEditable(false);

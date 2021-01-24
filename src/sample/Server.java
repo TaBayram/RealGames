@@ -364,7 +364,11 @@ public class Server {
         }
 
         private void nextQuestion(){
-
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             concurrentMath.level ++;
             concurrentMath.CreateQuestion();
             DataPackages.MathQuestion mathQuestion = new DataPackages().new MathQuestion();
